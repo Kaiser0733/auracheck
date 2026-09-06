@@ -4,7 +4,15 @@
 
 **Architecture:** Single-page vanilla HTML/CSS/JS app (no framework — phone CPU friendly, no build step). Cards are quiz → deterministic engine → canvas-rendered 1080×1920 PNG. State (quota, Pro flag, history) lives in localStorage with IndexedDB fallback. Payments in MVP = manual UPI + unlock code (₹0 fees, offline); Razorpay integration is a post-validation task.
 
-**Constraint law (from LO):** No external APIs. No AI calls. Everything works fully offline after first load (PWA installable). Phone-first: target 360×740 viewport, touch targets ≥48px. Every card render must complete in <500ms on a low-end Android.
+**Constraint law (from LO):** No external APIs. No AI calls at runtime. Card generation works offline after first load (PWA cache); **the first install + payments need internet** — plan says this plainly, no fake "fully offline" claim. Phone-first: target 360×740 viewport, touch targets ≥48px. Card render <500ms on low-end Android.
+
+**Locked product decisions (LO call, 2026-09-06):**
+- Look: **Dark premium** — deep black bg, gold/iridescent accents, Co-Star energy. One visual system, not per-archetype palettes.
+- Voice: **English with desi sprinkles** — "certified delulu since 2004" register. No Devanagari, no full Hinglish.
+- Roast level: **savage-but-loving** (single mode).
+- Audience: **all-gender neutral** voice; gender editions are a post-validation roadmap item.
+- Quiz UX: **no time limit** — user can ponder as long as they want (LO explicit ask).
+- Card art: concepts will be generated via ChatGPT (Termux X11 browser flow), then hand-translated into canvas code so runtime stays API-free.
 
 **Hosting:** GitHub repo + GitHub Pages (free). CNAME later if/when a domain is bought. Deploy = push to `main`, Pages serves `/docs` or `gh-pages` branch.
 
@@ -51,7 +59,7 @@ Create `js/questions.js`. Six questions, four options each, each option tagged w
 ```js
 // qs: id, text, opts:[{t:display, w:{drama, delulu, grind, soft}}]
 const QUIZ = [
- {id:1, text:"3 AM ho. tum kya kar rahe ho?", opts:[
+ {id:1, text:"It's 3 AM. What are you actually doing?", opts:[
   {t:"kisi ke msg ka reply sochna", w:{drama:2}},
   {t:"'kal se pakka serious' plan banana", w:{delulu:2}},
   {t:"actually padhna/kam karna", w:{grind:2}},
