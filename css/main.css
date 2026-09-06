@@ -1,0 +1,67 @@
+/* AuraCheck design system — dark premium, gold/iridescent accents */
+:root{
+  --bg:#0f0d14;
+  --bg2:#17141f;
+  --ink:#f5f1ea;
+  --ink-dim:#9b93a8;
+  --gold:#ffd479;
+  --gold2:#ffb347;
+  --irid:#a78bfa; /* violet iridescent */
+  --danger:#ff6b81;
+  --card:#191624;
+  --line:#2a2438;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+body{min-height:100dvh;display:flex;justify-content:center}
+#app{width:100%;max-width:480px}
+
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:22px;gap:18px;text-align:center;animation:fadeIn .25s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* HOME */
+.logo-block{line-height:1}
+.logo{font-size:42px;font-weight:800;letter-spacing:-1px;margin:0;background:linear-gradient(120deg,var(--gold) 20%,var(--irid) 50%,var(--gold2) 80%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 6s ease-in-out infinite}
+@keyframes sheen{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.tagline{color:var(--ink-dim);font-size:15px;margin-top:6px}
+.quota-pill{border:1px solid var(--line);border-radius:999px;padding:8px 16px;color:var(--ink-dim);font-size:13px;margin-top:8px}
+.quota-pill b{color:var(--gold)}
+.fineprint{color:var(--ink-dim);font-size:12px;position:absolute;bottom:22px}
+
+/* buttons */
+.cta{background:linear-gradient(120deg,var(--gold2),var(--gold));color:#221a00;border:0;border-radius:16px;font-weight:700;font-size:17px;padding:16px 34px;width:100%;max-width:320px;box-shadow:0 8px 28px rgba(255,180,71,.25);transition:transform .08s}
+.cta:active{transform:scale(.97)}
+.cta.small{padding:12px 24px;font-size:15px}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:16px;padding:15px 34px;width:100%;max-width:320px;font-size:15px}
+.ghost.quiet{border:0;color:var(--ink-dim);text-decoration:underline}
+
+/* QUIZ */
+.quiz-progress{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+.q-text{font-size:26px;font-weight:700;line-height:1.25;max-width:340px}
+.opts{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:15.5px;text-align:left;color:var(--ink);line-height:1.35;transition:border-color .15s,transform .1s}
+.opt:active{border-color:var(--gold);transform:scale(.98)}
+.opt:hover{border-color:var(--irid)}
+
+/* CARD */
+.card-holder{width:100%;max-width:340px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6)}
+#card-canvas{width:100%;height:auto;display:block}
+.card-actions{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+
+/* PRO */
+.pro-title{font-size:34px;margin:0;background:linear-gradient(120deg,var(--gold),var(--irid));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pro-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:12px;font-size:16px}
+.pro-list li::before{content:'✦ ';color:var(--gold)}
+.upi-box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px}
+.upi-line{margin:0;font-size:14.5px;color:var(--ink)}
+.upi-line b{color:var(--gold)}
+.upi-sub{margin:0;font-size:12px;color:var(--ink-dim)}
+#unlock-input{background:#0d0b12;border:1px solid var(--line);border-radius:10px;padding:13px;color:var(--ink);font-size:16px;text-align:center;letter-spacing:1px;text-transform:uppercase}
+.unlock-msg{min-height:18px;font-size:13px;margin:0}
+.unlock-msg.ok{color:#8be08b}
+.unlock-msg.err{color:var(--danger)}
+
+/* toast for share/copy feedback */
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(20px);background:var(--card);border:1px solid var(--gold);color:var(--ink);padding:12px 22px;border-radius:999px;font-size:14px;opacity:0;transition:all .25s;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
