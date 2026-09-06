@@ -1,0 +1,10 @@
+{
+  "name": "AuraCheck",
+  "short_name": "AuraCheck",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f0d14",
+  "theme_color": "#0f0d14",
+  "description": "Your weekly life report. Roast or worship, honestly.",
+  "icons": []
+}
