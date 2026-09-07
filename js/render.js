@@ -67,7 +67,7 @@
     // trait percentage bars
     if (percents) {
       let by = 900;
-      const rows = [['✦ Aura', percents.aura],['⌖ Delulu', percents.delulu],['☠ Toxic', percents.toxic],['☁ Chill', percents.chill]];
+      const rows = [['✦ Aura', percents.aura],['⌖ Delulu', percents.delulu],['☀ Prickly', percents.toxic],['☁ Chill', percents.chill]];
       rows.forEach(([label, pc]) => {
         ctx.fillStyle = '#9b93a8';
         ctx.font = '600 32px system-ui';

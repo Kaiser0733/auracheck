@@ -1,6 +1,6 @@
 (function () {
   const $ = id => document.getElementById(id);
-  const DRAFT = 'ac_draft_v4', HISTORY = 'ac_history_v1';
+  const DRAFT = 'ac_draft_v6_today', HISTORY = 'ac_history_v1';
   let answers = [], qi = 0, name = '', selected, busy = false;
   let nextAllowedAt = 0;
   function history() {
@@ -89,7 +89,7 @@
     target.getContext('2d').clearRect(0,0,target.width,target.height);
     target.getContext('2d').drawImage(rendered,0,0);
     const transcript=[payload.name,payload.headline,payload.sub,...payload.lines,
-      ...Object.entries(payload.percents).map(([trait,pct])=>`${trait}: ${pct}%`),'Entertainment only.'].filter(Boolean).join(' ');
+      ...Object.entries(payload.percents).map(([trait,pct])=>`${trait==='toxic'?'prickly':trait}: ${pct}%`),'Entertainment only.'].filter(Boolean).join(' ');
     target.setAttribute('aria-label',transcript);$('card-transcript').textContent=transcript;
   }
   async function finish() {
@@ -131,7 +131,7 @@
   async function exportCard(share) {
     const button=$(share?'btn-share':'btn-save');button.disabled=true;
     try {
-      const outcome=share ? await ShareKit.shareCanvas($('card-canvas'),`My aura got audited. Your turn: ${new URL('./',location.href).href}`) : await ShareKit.downloadCanvas($('card-canvas'));
+      const outcome=share ? await ShareKit.shareCanvas($('card-canvas'),`My aura today. Your turn: ${new URL('./',location.href).href}`) : await ShareKit.downloadCanvas($('card-canvas'));
       ShareKit.toast(outcome==='shared'?'Shared.':'Download started. Check your browser downloads.');
     } catch(error){if(error.name!=='AbortError')ShareKit.toast('Could not export. Your card is saved here; try again.');}
     finally{button.disabled=false;}
