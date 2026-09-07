@@ -9,6 +9,8 @@
   function score(answers, quiz) {
     const tot = { aura:0, delulu:0, toxic:0, chill:0 };
     answers.forEach((optIdx, qi) => {
+      if (optIdx === null) return;
+      if (!Number.isInteger(optIdx) || !quiz[qi]?.options[optIdx]) throw new Error('Choose an answer or skip this question.');
       const opt = quiz[qi].options[optIdx];
       for (const k in (opt.weights||{})) tot[k] = (tot[k]||0) + opt.weights[k];
     });
@@ -44,13 +46,9 @@
    * ROTATE through the 3 cards each week so variety exists even unpaid.
    * Pro: fresh random each time within the archetype's deck.
    */
-  function pickCard(trait, cards, pro) {
+  function pickCard(trait, cards, pro, sequence = 0) {
     const list = cards[trait];
-    const today = new Date();
-    if (pro) return list[(today.getDate() + Math.floor(Math.random()*list.length)) % list.length];
-    // free tier: rotate by week number so each week's card differs
-    const week = Math.floor((today - new Date(today.getFullYear(),0,1)) / 604800000);
-    return list[week % list.length];
+    return list[Math.max(0, Math.trunc(sequence)) % list.length];
   }
 
   global.Engine = { score, archetype, percentages, pickCard };

@@ -2,98 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f0d14">
-<title>AuraCheck</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#100f12">
+<meta name="description" content="Eight everyday choices. One affectionate roast. Make your AuraCheck card and share it.">
+<title>AuraCheck — your weekly read</title>
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/main.css">
-<script>
-if ('serviceWorker' in navigator) {
-window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
-</script>
+<script defer src="js/store.js"></script><script defer src="js/questions.js"></script>
+<script defer src="js/cards.js"></script><script defer src="js/engine.js"></script>
+<script defer src="js/quota.js"></script><script defer src="js/render.js"></script>
+<script defer src="js/share.js"></script><script defer src="js/app.js"></script>
 </head>
 <body>
-
+<header class="masthead"><a href="#home">auracheck<span aria-hidden="true"> / </span></a><span class="edition">THE WEEKLY READ · BETA</span></header>
 <main id="app">
-
-  <!-- HOME -->
-  <section id="screen-home" class="screen active">
-    <div class="logo-block">
-      <h1 class="logo">auracheck</h1>
-      <p class="tagline">your weekly life report.</p>
-    </div>
-    <div class="quota-pill" id="quota-pill">3 cards left this week</div>
-    <button class="cta" id="btn-start">check my aura</button>
-    <button class="ghost" id="btn-pro">go pro — ₹99/mo</button>
-    <p class="fineprint">no account. no ads. just the truth.</p>
-  </section>
-
-  <!-- NAME -->
-  <section id="screen-name" class="screen">
-    <div class="quiz-progress">step 0 · identity</div>
-    <h2 class="q-text">what should the card call you?</h2>
-    <input type="text" id="name-input" class="name-input" placeholder="your name or vibe-alias" maxlength="20" autocomplete="off">
-    <button class="cta" id="btn-name-next">begin ↓</button>
-  </section>
-
-  <!-- QUIZ -->
-  <section id="screen-quiz" class="screen">
-    <div class="quiz-top">
-      <button class="quiz-back" id="btn-quiz-back" aria-label="back">←</button>
-      <div class="quiz-progress" id="quiz-progress">1 / 8</div>
-      <div class="quiz-bar"><div class="quiz-bar-fill" id="quiz-bar-fill"></div></div>
-    </div>
-    <h2 class="q-text" id="q-text"></h2>
-    <div class="opts" id="q-opts"></div>
-  </section>
-
-  <!-- RITUAL, between quiz and card -->
-  <section id="screen-ritual" class="screen">
-    <div class="ritual-orbit"><div class="ritual-dot"></div></div>
-    <p class="ritual-line" id="ritual-line">reading your aura...</p>
-  </section>
-
-  <!-- CARD -->
-  <section id="screen-card" class="screen">
-    <div class="card-holder">
-      <canvas id="card-canvas" width="1080" height="1920"></canvas>
-    </div>
-    <div class="card-actions">
-      <button class="cta" id="btn-share">share</button>
-      <button class="ghost" id="btn-save">save image</button>
-      <button class="ghost quiet" id="btn-again">make another</button>
-    </div>
-  </section>
-
-  <!-- PRO -->
-  <section id="screen-pro" class="screen">
-    <h2 class="pro-title">go pro ✦</h2>
-    <ul class="pro-list">
-      <li>unlimited cards</li>
-      <li>no watermark</li>
-      <li>premium savage templates</li>
-      <li>seasonal events — Diwali, exam results, valentine roast</li>
-    </ul>
-    <div class="upi-box">
-      <p class="upi-line">pay ₹99 via UPI → <b>kaiser0733@okaxis</b></p>
-      <p class="upi-sub">then enter the unlock code you get</p>
-      <input type="text" id="unlock-input" placeholder="unlock code" autocomplete="off">
-      <button class="cta small" id="btn-unlock">unlock</button>
-      <p class="unlock-msg" id="unlock-msg"></p>
-    </div>
-    <button class="ghost quiet" id="btn-back-home">← back</button>
-  </section>
-
+<section id="screen-home" class="screen active" aria-labelledby="home-title">
+ <p class="eyebrow">A little self-awareness. A little slander.</p>
+ <h1 id="home-title" tabindex="-1">Your habits.<br><em>On the record.</em></h1>
+ <p class="intro">Eight everyday choices become a card your friends will have opinions about.</p>
+ <div class="sample" aria-label="Example card, not your result"><span class="eyebrow">SAMPLE / NOT YOUR RESULT</span><h2>Evidence Keeper</h2><p>“You have a receipts folder. It's labeled.”</p><span class="sample-stamp">FILED + LOGGED</span></div>
+ <p id="quota-pill" class="quota-pill"></p><p id="reset-note" class="muted"></p>
+ <button class="cta" id="btn-start">Check my aura</button>
+ <button class="ghost" id="btn-resume" hidden>Resume unfinished quiz</button>
+ <button class="ghost" id="btn-history">Saved cards</button>
+ <button class="text-button" id="btn-pro">About Pro — planned ₹99/month</button>
+ <p class="fineprint">Made for fun, not a personality diagnosis. No account or AI. Your answers stay in this browser.</p>
+</section>
+<section id="screen-name" class="screen" aria-labelledby="name-title">
+ <button class="text-button" data-home>Back home</button>
+ <p class="eyebrow">YOUR CARD, YOUR ALIAS</p><h2 id="name-title" tabindex="-1">What should we call you?</h2>
+ <label for="name-input">Name or nickname (optional)</label>
+ <input id="name-input" class="name-input" type="text" maxlength="20" autocomplete="nickname" placeholder="Anonymous works too">
+ <p class="muted">This name appears on the image you share.</p><button class="cta" id="btn-name-next">Start the questions</button>
+</section>
+<section id="screen-quiz" class="screen" aria-labelledby="q-text">
+ <div class="quiz-top"><button class="quiz-back" id="btn-quiz-back" aria-label="Previous question">←</button><span id="quiz-progress"></span><button class="text-button" id="btn-pause">Save & exit</button></div>
+ <progress id="quiz-bar-fill" value="0" max="8" aria-label="Questions completed"></progress>
+ <h2 class="q-text" id="q-text" tabindex="-1"></h2>
+ <p class="muted">Pick your usual response. No answer fits? Skip it.</p>
+ <div class="opts" id="q-opts" role="group" aria-labelledby="q-text"></div>
+ <button class="text-button" id="btn-skip">None of these / skip</button>
+ <button class="cta" id="btn-next" disabled>Next question</button>
+ <p class="muted" id="quiz-message" role="status"></p>
+</section>
+<section id="screen-card" class="screen" aria-labelledby="card-title">
+ <button class="text-button" data-home>Back home</button><h2 id="card-title" tabindex="-1">The verdict is in.</h2>
+ <div class="card-holder"><canvas id="card-canvas" width="1080" height="1920" role="img" aria-label="Your AuraCheck card"></canvas></div>
+ <details><summary>Read card as text</summary><p id="card-transcript"></p></details>
+ <div class="card-actions"><button class="cta" id="btn-share">Share / save</button><button class="ghost" id="btn-save">Download PNG</button><button class="text-button" id="btn-again">Make another card</button></div>
+ <p class="muted">Sharing or downloading this card again uses no credits.</p>
+</section>
+<section id="screen-history" class="screen" aria-labelledby="history-title">
+ <button class="text-button" data-home>Back home</button><h2 id="history-title" tabindex="-1">Your paper trail.</h2>
+ <p class="muted">Your latest 20 cards, stored in this browser. Download favorites to keep them if browser data is cleared.</p><div id="history-list"></div>
+</section>
+<section id="screen-pro" class="screen" aria-labelledby="pro-title">
+ <button class="text-button" data-home>Back home</button><p class="eyebrow">PLANNED MEMBERSHIP</p><h2 id="pro-title" tabindex="-1">More room for chaos.</h2>
+ <p>Pro is planned at ₹99/month. Unlimited cards, watermark-free exports and additional themes are planned benefits, not available purchases yet.</p>
+ <p class="notice">Payments are not open. Please do not send money. Secure checkout and reliable account access must be ready first.</p>
+ <p class="muted">For now, enjoy three free cards each week. Extra-card pricing has not been set.</p>
+</section>
 </main>
-
-<script src="js/store.js"></script>
-<script src="js/questions.js"></script>
-<script src="js/cards.js"></script>
-<script src="js/engine.js"></script>
-<script src="js/quota.js"></script>
-<script src="js/render.js"></script>
-<script src="js/share.js"></script>
-<script src="js/app.js"></script>
+<footer>auracheck / entertainment, not evidence.<br><span id="storage-note">Local browser storage · no cloud backup</span></footer>
+<noscript><p class="notice">AuraCheck needs JavaScript to make cards. No answers are sent to a server.</p></noscript>
+<div id="status" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

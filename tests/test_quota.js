@@ -38,11 +38,11 @@ t('quota resets next week', () => {
   assert.strictEqual(Q.remaining(), 3);
 });
 
-t('pro bypasses quota', () => {
-  Q.unlock('AC-PRO-2026'.toUpperCase()); // raw code; quota unlocks via hash
-  assert.strictEqual(Q.remaining(), Infinity);
-  Q.consume(); Q.consume(); Q.consume(); Q.consume();
-  assert.strictEqual(Q.remaining(), Infinity);
+t('legacy codes cannot bypass beta quota', () => {
+  Q._reset();
+  assert.strictEqual(Q.unlock('AC-PRO-2026'), false);
+  Q.consume(); Q.consume(); Q.consume();
+  assert.strictEqual(Q.remaining(), 0);
 });
 
 t('invalid code rejected', () => {
@@ -51,9 +51,9 @@ t('invalid code rejected', () => {
   assert.strictEqual(Q.isPro(), false);
 });
 
-t('valid code unlocks pro', () => {
-  assert.strictEqual(Q.unlock('AC-FOUNDER'), true);
-  assert.strictEqual(Q.isPro(), true);
+t('beta membership stays inactive', () => {
+  assert.strictEqual(Q.unlock('AC-FOUNDER'), false);
+  assert.strictEqual(Q.isPro(), false);
 });
 
 console.log(`\n${pass} tests passed`);

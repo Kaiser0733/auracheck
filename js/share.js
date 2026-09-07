@@ -1,30 +1,29 @@
-// share.js — share canvas via Web Share API (files), fallback to download
-(function (global) {
-  async function canvasToBlob(cv) {
-    return new Promise(res => cv.toBlob(res, 'image/png', 0.95));
+(function(global){
+  let toastTimer;
+  function canvasToBlob(canvas){
+    return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(Error('Image export failed.')),'image/png'));
   }
-  async function shareCanvas(cv, text) {
-    const blob = await canvasToBlob(cv);
-    const file = new File([blob], 'auracheck.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], text });
-      return 'shared';
-    }
-    downloadCanvas(cv);
+  async function downloadCanvas(canvas){
+    const blob=await canvasToBlob(canvas),url=URL.createObjectURL(blob);
+    const link=document.createElement('a');link.href=url;link.download='auracheck.png';
+    document.body.append(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),30000);
     return 'downloaded';
   }
-  function downloadCanvas(cv) {
-    const a = document.createElement('a');
-    a.download = 'auracheck.png';
-    a.href = cv.toDataURL('image/png');
-    a.click();
+  async function shareCanvas(canvas,text){
+    const blob=await canvasToBlob(canvas);
+    if(typeof File!=='undefined' && navigator.share && navigator.canShare){
+      const file=new File([blob],'auracheck.png',{type:'image/png'});
+      if(navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],text});return 'shared';
+      }
+    }
+    return downloadCanvas(canvas);
   }
-  function toast(msg) {
-    let t = document.querySelector('.toast');
-    if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
+  function toast(message){
+    const status=document.getElementById('status');
+    status.textContent=message;status.classList.add('show');
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>status.classList.remove('show'),4500);
   }
-  global.ShareKit = { shareCanvas, downloadCanvas, toast };
+  global.ShareKit={canvasToBlob,downloadCanvas,shareCanvas,toast};
 })(this);

@@ -1,0 +1,1 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');global.Store={get:()=>({pro:true,used:0,week:''}),set:()=>{},del:()=>{}};require('../js/quota.js');test('legacy demo flags cannot activate paid membership',()=>{assert.equal(global.Quota.isPro(),false);assert.equal(global.Quota.unlock('AC-FOUNDER'),false);});

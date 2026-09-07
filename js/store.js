@@ -1,10 +1,23 @@
-// store.js — localStorage wrapper with graceful in-memory fallback
 (function (global) {
-  const MEM = {};
-  const hasLS = (() => { try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return true; } catch(e){ return false; } })();
+  const memory = new Map();
+  let persistent = true;
   global.Store = {
-    get(k){ try{ return JSON.parse(hasLS ? localStorage.getItem(k) : (MEM[k] ?? null)); }catch(e){ return null; } },
-    set(k,v){ const s = JSON.stringify(v); if(hasLS){ localStorage.setItem(k, s); } else { MEM[k] = s; } },
-    del(k){ if(hasLS) localStorage.removeItem(k); else delete MEM[k]; }
+    get(key) {
+      if (!persistent && memory.has(key)) return JSON.parse(memory.get(key));
+      try { return JSON.parse(localStorage.getItem(key)); }
+      catch { persistent = false; return memory.has(key) ? JSON.parse(memory.get(key)) : null; }
+    },
+    set(key, value) {
+      const serialized = JSON.stringify(value);
+      memory.set(key, serialized);
+      try { localStorage.setItem(key, serialized); return true; }
+      catch { persistent = false; return false; }
+    },
+    del(key) {
+      memory.set(key, 'null');
+      try { localStorage.removeItem(key); }
+      catch { persistent = false; }
+    },
+    get persistent() { return persistent; }
   };
-})(this);
+})(typeof module !== 'undefined' ? global : this);

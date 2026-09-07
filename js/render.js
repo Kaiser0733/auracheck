@@ -33,13 +33,13 @@
     ctx.fillStyle = '#6c6579';
     ctx.font = '500 30px system-ui';
     ctx.textAlign = 'right';
-    const dstr = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    const dstr = new Date(payload.createdAt || Date.now()).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' });
     ctx.fillText(dstr, W-80, 140);
     if (name) {
       ctx.textAlign = 'left';
       ctx.fillStyle = '#9b93a8';
       ctx.font = '500 32px system-ui';
-      ctx.fillText(`for ${name}`, 80, 210);
+      ctx.fillText(`for ${name}`, 80, 210, W-160);
     }
 
     // headline (big serif-ish, gold)
@@ -48,7 +48,7 @@
     ctx.font = '800 92px Georgia, serif';
     ctx.shadowColor = palette.glow;
     ctx.shadowBlur = 30;
-    wrapText(ctx, headline, 80, 560, W-160, 100);
+    wrapText(ctx, headline, 80, 410, W-160, 100);
     ctx.shadowBlur = 0;
 
     // sub line
@@ -99,17 +99,18 @@
 
     // stamp — rotated capsule
     ctx.save();
-    ctx.translate(W-240, H-240);
+    ctx.translate(W/2, H-240);
     ctx.rotate(-0.10);
     ctx.strokeStyle = palette.stamp;
     ctx.lineWidth = 5;
-    const sw = ctx.measureText(stamp).width + 90;
+    ctx.font = '800 38px system-ui';
+    const sw = Math.min(W-180, ctx.measureText(stamp).width + 90);
     roundRect(ctx, -sw/2, -60, sw, 110, 20);
     ctx.stroke();
     ctx.fillStyle = palette.stamp;
     ctx.font = '800 38px system-ui';
     ctx.textAlign = 'center';
-    ctx.fillText(stamp, 0, 12);
+    ctx.fillText(stamp, 0, 12, sw-60);
     ctx.restore();
 
     // watermark (free only)
@@ -117,7 +118,7 @@
       ctx.fillStyle = 'rgba(155,147,168,0.6)';
       ctx.font = '500 28px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText('made with auracheck ✦ check yours', W/2, H-70);
+      ctx.fillText('made with auracheck ✦ check yours', W/2, H-100);
     }
 
     return cv;

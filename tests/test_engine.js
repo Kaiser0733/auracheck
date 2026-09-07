@@ -33,11 +33,8 @@ t('each card has stamp + palette', () => {
 
 // --- scoring ---
 t('mixed answers sum weights correctly', () => {
-  const tot = score([0,1], QUIZ); // q1.opt0: post aesthetic story (t4,d4,a2); q2.opt1: video essay (a3,d3,c4)
-  assert.strictEqual(tot.delulu, 7);
-  assert.strictEqual(tot.chill, 4);
-  assert.strictEqual(tot.aura, 5);
-  assert.strictEqual(tot.toxic, 4);
+  const fixture=[{options:[{weights:{aura:2,delulu:4,toxic:4}}]},{options:[{weights:{aura:3,delulu:3,chill:4}}]}];
+  assert.deepStrictEqual(score([0,0],fixture),{aura:5,delulu:7,toxic:4,chill:4});
 });
 t('archetype picks max weight', () => {
   assert.strictEqual(archetype({aura:20,delulu:10,toxic:5,chill:1}), 'aura');
@@ -59,7 +56,7 @@ t('empty score → even 25/25/25/25', () => {
 });
 
 // --- card pick ---
-t('free tier rotates weekly', () => {
+t('free tier returns an available card', () => {
   const c = pickCard('aura', CARDS, false);
   assert.ok(CARDS.aura.includes(c));
 });

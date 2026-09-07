@@ -1,92 +1,46 @@
-// AuraCheck quiz v2 — rewritten after LO feedback.
-// Voice: English with desi sprinkles. Savage-loving. All-gender neutral.
-// Rule: every option must be a CONCRETE situation a real person would pick,
-// not a generic personality-test answer. Weights sum to 10 per option.
-// Traits: aura / delulu / toxic / chill
-
+// Entertainment categories, not a validated psychological instrument.
+// Plain answers first; the result card carries the joke. Skip is always available.
 const QUIZ = [
-  {
-    id: 1,
-    text: "They viewed your story but didn't reply to your message. You:",
-    options: [
-      { text: "Post an extra-aesthetic story within the hour. Checkmate.", weights: { toxic: 4, delulu: 4, aura: 2 } },
-      { text: "Re-read my own message 6 times. maybe 'lol' was too much.", weights: { delulu: 8, chill: 2 } },
-      { text: "Screenshot for the gc: 'am I overthinking' (I am)", weights: { toxic: 6, delulu: 2, chill: 2 } },
-      { text: "Genuinely forgot I texted them until just now", weights: { chill: 9, aura: 1 } }
-    ]
-  },
-  {
-    id: 2,
-    text: "It's 3 AM. The honest truth of your screen:",
-    options: [
-      { text: "Instagram reels → 5s skip → repeat × 200", weights: { delulu: 6, chill: 4 } },
-      { text: "Watching a 20-min video essay about a show I've never seen", weights: { aura: 3, delulu: 3, chill: 4 } },
-      { text: "'Kal se productive era.' I say this nightly since 2023", weights: { delulu: 7, chill: 3 } },
-      { text: "Actually asleep because I have shame-free discipline", weights: { aura: 8, chill: 2 } }
-    ]
-  },
-  {
-    id: 3,
-    text: "Someone in the group chat sends a corny meme. You:",
-    options: [
-      { text: "Leave them on seen. Silence is the review.", weights: { toxic: 8, aura: 2 } },
-      { text: "'💀💀💀' — even if it wasn't funny, diplomacy", weights: { chill: 6, delulu: 2, aura: 2 } },
-      { text: "Send a BETTER meme immediately to fix the vibe", weights: { aura: 7, chill: 3 } },
-      { text: "Screenshot it to cringe-discuss on another gc", weights: { toxic: 9, chill: 1 } }
-    ]
-  },
-  {
-    id: 4,
-    text: "Your convince-myself-to-buy-it process:",
-    options: [
-      { text: "UPI balance screenshot → 'I deserve this' → ordered", weights: { delulu: 8, toxic: 2 } },
-      { text: "7 open tabs, price-compare, reviews at 2 AM", weights: { aura: 6, chill: 4 } },
-      { text: "Add to cart. Close app. Re-add. Repeat monthly.", weights: { delulu: 7, chill: 3 } },
-      { text: "Das ki budget hi nahi hai, so I just fantasize", weights: { chill: 8, delulu: 2 } }
-    ]
-  },
-  {
-    id: 5,
-    text: "Somebody insults you nicely (the 'I'm just saying' type). You:",
-    options: [
-      { text: "Smile. File it. Deploy it 4 months later at the perfect moment", weights: { toxic: 9, aura: 1 } },
-      { text: "Instant comeback, respectfully unhinged", weights: { aura: 7, toxic: 3 } },
-      { text: "Spend the next 2 hours making it a character arc", weights: { delulu: 8, chill: 2 } },
-      { text: "Genuinely didn't register until someone explained it to me", weights: { chill: 9, delulu: 1 } }
-    ]
-  },
-  {
-    id: 6,
-    text: "Your camera roll right now is mostly:",
-    options: [
-      { text: "Screenshots of texts, as admissible evidence", weights: { toxic: 8, delulu: 2 } },
-      { text: "0 selfie, 14 sky photos nobody asked for", weights: { chill: 8, delulu: 2 } },
-      { text: "Outfit checks I never posted (bridging to Lunar New Year era)", weights: { delulu: 9, aura: 1 } },
-      { text: "Notes app screenshots of fake scenarios", weights: { delulu: 6, toxic: 4 } }
-    ]
-  },
-  {
-    id: 7,
-    text: "How do you see yourself at family functions?",
-    options: [
-      { text: "The aesthetic one — I bring the good outfits AND the gossip", weights: { aura: 8, chill: 2 } },
-      { text: "Phone > relatives. Consistent since 2019", weights: { chill: 7, toxic: 3 } },
-      { text: "Stretching one 'aur batao' conversation for 40 minutes", weights: { chill: 6, aura: 4 } },
-      { text: "Charging my phone in the farthest room. De dene waala", weights: { delulu: 6, toxic: 4 } }
-    ]
-  },
-  {
-    id: 8,
-    text: "Your current life chapter, honestly:",
-    options: [
-      { text: "Main-character era. Loud and booked", weights: { aura: 10 } },
-      { text: "Plotting. Offline. Something big cooking", weights: { toxic: 5, chill: 5 } },
-      { text: "Rock bottom but make it a meme ✨", weights: { delulu: 9, chill: 1 } },
-      { text: "Peacefully irrelevant. Vibes", weights: { chill: 10 } }
-    ]
-  }
+ {id:1,text:"A message you sent yesterday still has no reply. What do you usually do?",options:[
+  {text:"Send one follow-up if I need an answer.",weights:{aura:7,chill:3}},
+  {text:"Check the chat again and wonder what I said.",weights:{delulu:8,chill:2}},
+  {text:"Decide they can wait for my next reply too.",weights:{toxic:8,delulu:2}},
+  {text:"Leave it alone and get on with my day.",weights:{chill:9,aura:1}}]},
+ {id:2,text:"You get an unexpected hour to yourself. Your first choice?",options:[
+  {text:"Open an app and see where the scroll takes me.",weights:{chill:6,delulu:4}},
+  {text:"Watch or read something I've been curious about.",weights:{aura:3,delulu:3,chill:4}},
+  {text:"Start planning something I want to do.",weights:{delulu:6,aura:4}},
+  {text:"Rest. No need to turn it into a project.",weights:{chill:10}}]},
+ {id:3,text:"Your friends can't decide what to do together. What role do you take?",options:[
+  {text:"Suggest a plan and sort out the details.",weights:{aura:10}},
+  {text:"Pick a favorite and try to get everyone on board.",weights:{aura:5,toxic:5}},
+  {text:"Offer more ideas. Possibly too many.",weights:{delulu:8,aura:2}},
+  {text:"Go with the group. I'm there for the company.",weights:{chill:10}}]},
+ {id:4,text:"Something you want costs more than you planned to spend. What happens next?",options:[
+  {text:"Buy it anyway if I can cover the essentials.",weights:{delulu:8,aura:2}},
+  {text:"Compare alternatives before deciding.",weights:{aura:6,chill:4}},
+  {text:"Save it and keep thinking about it.",weights:{delulu:7,chill:3}},
+  {text:"Pass for now. The budget wins.",weights:{chill:8,aura:2}}]},
+ {id:5,text:"A friend makes a joke about you that goes too far. Your usual response?",options:[
+  {text:"Say directly that it bothered me.",weights:{aura:8,chill:2}},
+  {text:"Make a sharper joke back.",weights:{toxic:8,aura:2}},
+  {text:"Laugh along, then replay it later.",weights:{delulu:8,chill:2}},
+  {text:"Let it go unless it happens again.",weights:{chill:8,aura:2}}]},
+ {id:6,text:"You have news you're excited about. Who hears first?",options:[
+  {text:"Everyone. I'm ready to announce it.",weights:{aura:10}},
+  {text:"One close person, with every tiny detail.",weights:{delulu:6,chill:4}},
+  {text:"A few people after I've decided how to tell it.",weights:{toxic:5,aura:5}},
+  {text:"Nobody yet. I enjoy it privately first.",weights:{chill:10}}]},
+ {id:7,text:"At a gathering where you know one person, what do you usually do first?",options:[
+  {text:"Introduce myself to someone new.",weights:{aura:10}},
+  {text:"Stay with the person I know until I settle in.",weights:{chill:8,delulu:2}},
+  {text:"Look around and choose a conversation to join.",weights:{aura:4,toxic:4,chill:2}},
+  {text:"Find a quieter spot and take it slowly.",weights:{chill:7,delulu:3}}]},
+ {id:8,text:"Which best describes how you make plans lately?",options:[
+  {text:"Choose something and actually put it on the calendar.",weights:{aura:10}},
+  {text:"Keep the details to myself until I'm ready.",weights:{toxic:5,chill:5}},
+  {text:"Imagine several futures before choosing one.",weights:{delulu:9,chill:1}},
+  {text:"Leave room to decide when the day arrives.",weights:{chill:10}}]}
 ];
-
-const TRAITS = ['aura', 'delulu', 'toxic', 'chill'];
-
-if (typeof module !== 'undefined') module.exports = { QUIZ, TRAITS };
+const TRAITS=['aura','delulu','toxic','chill'];
+if(typeof module!=='undefined') module.exports={QUIZ,TRAITS};
