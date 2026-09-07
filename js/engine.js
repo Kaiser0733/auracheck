@@ -40,19 +40,17 @@
   }
 
   /**
-   * Pick a card: deterministic by day-seed so siblings get same card each day,
-   * different across days. Free tier gives 1/week/1, PRO gives variety.
-   * @param {string} trait
-   * @param {Array} cards - CARDS[trait]
-   * @param {boolean} pro
-   * @returns {object} card
+   * Pick a card: same-day stability (siblings get same card), but free users
+   * ROTATE through the 3 cards each week so variety exists even unpaid.
+   * Pro: fresh random each time within the archetype's deck.
    */
   function pickCard(trait, cards, pro) {
     const list = cards[trait];
     const today = new Date();
-    const seed = today.getFullYear()*10000 + (today.getMonth()+1)*100 + today.getDate();
-    if (!pro) return list[0]; // free tier = fixed base card
-    return list[(seed + Math.floor(Math.random()*list.length)) % list.length];
+    if (pro) return list[(today.getDate() + Math.floor(Math.random()*list.length)) % list.length];
+    // free tier: rotate by week number so each week's card differs
+    const week = Math.floor((today - new Date(today.getFullYear(),0,1)) / 604800000);
+    return list[week % list.length];
   }
 
   global.Engine = { score, archetype, percentages, pickCard };

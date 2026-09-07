@@ -47,14 +47,16 @@
 
   function isPro() { return _load().pro; }
 
-  /** Unlock codes: AC-PRO-2026, AC-FOUNDER, AC-LAUNCH. Returns true if valid. */
-  const VALID_CODES = ['AC-PRO-2026', 'AC-FOUNDER', 'AC-LAUNCH'];
+  /** Unlock codes: hashed client-side. Not bulletproof (client-side secret by
+   *  definition) — rotated monthly + roadmap serverless validation. */
+  const VALID_HASHES = ['76f0b03','a65b4d8c','3746f3f2']; // hashed unlock codes
+  function _h(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0}return h.toString(16).slice(0,8)}
   function unlock(code) {
     if (!code) return false;
-    const ok = VALID_CODES.includes(String(code).trim().toUpperCase());
+    const ok = VALID_HASHES.includes(_h(String(code).trim().toUpperCase() + '·aurasalt'));
     if (ok) {
       const q = _load();
-      q.pro = true; q.proCode = code.trim().toUpperCase();
+      q.pro = true; q.proCode = '***';
       Store.set(KEY, q);
     }
     return ok;

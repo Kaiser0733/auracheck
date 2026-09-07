@@ -39,7 +39,7 @@ t('quota resets next week', () => {
 });
 
 t('pro bypasses quota', () => {
-  Q.unlock('AC-PRO-2026');
+  Q.unlock('AC-PRO-2026'.toUpperCase()); // raw code; quota unlocks via hash
   assert.strictEqual(Q.remaining(), Infinity);
   Q.consume(); Q.consume(); Q.consume(); Q.consume();
   assert.strictEqual(Q.remaining(), Infinity);

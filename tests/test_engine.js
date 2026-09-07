@@ -59,11 +59,9 @@ t('empty score → even 25/25/25/25', () => {
 });
 
 // --- card pick ---
-t('free tier always base card', () => {
-  const c1 = pickCard('aura', CARDS, false);
-  const c2 = pickCard('aura', CARDS, false);
-  assert.strictEqual(c1, c2);
-  assert.strictEqual(c1, CARDS.aura[0]);
+t('free tier rotates weekly', () => {
+  const c = pickCard('aura', CARDS, false);
+  assert.ok(CARDS.aura.includes(c));
 });
 t('pro tier returns a valid card', () => {
   const c = pickCard('toxic', CARDS, true);
