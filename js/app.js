@@ -125,6 +125,7 @@
       Store.del(DRAFT);show('screen-card');storageNote();
     };
     try {
+      await Render.ready;
       if(navigator.locks)await navigator.locks.request('auracheck-generate',complete);
       else complete();
     } catch(error){$('quiz-message').textContent=error.message;ShareKit.toast(error.message);}
@@ -137,7 +138,7 @@
     cards.forEach(payload=>{
       const button=document.createElement('button');button.className='history-entry';
       button.textContent=`${payload.name||'Anonymous'} · ${payload.headline}`;
-      button.onclick=()=>{try{displayCard(payload);show('screen-card');}catch{ShareKit.toast('This saved card could not be opened.');}};
+      button.onclick=async()=>{try{await Render.ready;displayCard(payload);show('screen-card');}catch{ShareKit.toast('This saved card could not be opened.');}};
       box.append(button);
     });
   }

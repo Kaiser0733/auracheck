@@ -2,8 +2,18 @@
 // renderCard(cardPayload, opts:{pro:boolean}) → HTMLCanvasElement
 (function (global) {
 
+  const backdrop=new Image();
+  let loaded=false;
+  const ready=new Promise(resolve=>{
+    backdrop.onload=()=>{loaded=true;resolve();};
+    backdrop.onerror=()=>resolve();
+    backdrop.src='assets/night-window.webp';
+  });
+
   function renderCard(payload, opts = {}) {
-    const { palette, headline, sub, lines, stamp, percents, name } = payload;
+    if(!loaded)throw Error('Card artwork is not ready. Check your connection and reload; no credit was used.');
+    const { headline, sub, lines, stamp, percents, name } = payload;
+    const palette={bg:'#171025',ink:'#f1ebfa',glow:'#d4baff',stamp:'#c6a6f4'};
     const pro = !!opts.pro;
 
     const W = 1080, H = 1920;
@@ -11,9 +21,15 @@
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
 
-    // background
-    ctx.fillStyle = palette.bg;
-    ctx.fillRect(0, 0, W, H);
+    // Clean right-hand panel of the supplied artwork; cover without stretching.
+    const scale=Math.max(W/backdrop.width,H/backdrop.height);
+    const bw=backdrop.width*scale,bh=backdrop.height*scale;
+    ctx.drawImage(backdrop,(W-bw)/2,(H-bh)/2,bw,bh);
+    const shade=ctx.createLinearGradient(0,0,0,H);
+    shade.addColorStop(0,'rgba(15,9,29,0.65)');
+    shade.addColorStop(0.64,'rgba(15,9,29,0.76)');
+    shade.addColorStop(1,'rgba(15,9,29,0.45)');
+    ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);
 
     // radial glow (gold/iridescent, soft)
     const g = ctx.createRadialGradient(W*0.5, H*0.28, 60, W*0.5, H*0.28, W*0.85);
@@ -23,21 +39,21 @@
     ctx.fillRect(0, 0, W, H);
 
     // header brand
-    ctx.fillStyle = '#9b93a8';
+    ctx.fillStyle = '#d5c5e8';
     ctx.font = '600 34px system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.letterSpacing = '3px';
     ctx.fillText('⟡  AURACHECK', 80, 140);
 
     // date + name
-    ctx.fillStyle = '#6c6579';
+    ctx.fillStyle = '#c3b5d3';
     ctx.font = '500 30px system-ui';
     ctx.textAlign = 'right';
     const dstr = new Date(payload.createdAt || Date.now()).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' });
     ctx.fillText(dstr, W-80, 140);
     if (name) {
       ctx.textAlign = 'left';
-      ctx.fillStyle = '#9b93a8';
+      ctx.fillStyle = '#d5c5e8';
       ctx.font = '500 32px system-ui';
       ctx.fillText(`for ${name}`, 80, 210, W-160);
     }
@@ -57,7 +73,7 @@
     wrapText(ctx, sub, 80, 700, W-160, 46);
 
     // divider
-    ctx.strokeStyle = '#2a2438';
+    ctx.strokeStyle = 'rgba(211,188,244,0.35)';
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(80, 820);
@@ -69,7 +85,7 @@
       let by = 900;
       const rows = [['✦ Aura', percents.aura],['⌖ Delulu', percents.delulu],['☀ Prickly', percents.toxic],['☁ Chill', percents.chill]];
       rows.forEach(([label, pc]) => {
-        ctx.fillStyle = '#9b93a8';
+        ctx.fillStyle = '#d5c5e8';
         ctx.font = '600 32px system-ui';
         ctx.fillText(label, 80, by);
         ctx.fillStyle = palette.glow;
@@ -77,7 +93,7 @@
         ctx.fillText(pc + '%', W-80, by);
         ctx.textAlign = 'left';
         // bar
-        ctx.fillStyle = '#241f30';
+        ctx.fillStyle = 'rgba(165,133,205,0.25)';
         ctx.fillRect(80, by+18, W-160, 14);
         ctx.fillStyle = palette.glow;
         ctx.fillRect(80, by+18, (W-160) * (pc/100), 14);
@@ -100,12 +116,13 @@
     // stamp — rotated capsule
     ctx.save();
     ctx.translate(W/2, H-240);
-    ctx.rotate(-0.10);
+    ctx.rotate(0);
     ctx.strokeStyle = palette.stamp;
     ctx.lineWidth = 5;
     ctx.font = '800 38px system-ui';
     const sw = Math.min(W-180, ctx.measureText(stamp).width + 90);
     roundRect(ctx, -sw/2, -60, sw, 110, 20);
+    ctx.fillStyle='rgba(81,51,119,0.28)';ctx.fill();
     ctx.stroke();
     ctx.fillStyle = palette.stamp;
     ctx.font = '800 38px system-ui';
@@ -115,7 +132,7 @@
 
     // watermark (free only)
     if (!pro) {
-      ctx.fillStyle = 'rgba(155,147,168,0.6)';
+      ctx.fillStyle = 'rgba(224,207,246,0.85)';
       ctx.font = '500 28px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText('made with auracheck ✦ check yours', W/2, H-100);
@@ -148,5 +165,5 @@
     ctx.closePath();
   }
 
-  global.Render = { renderCard };
+  global.Render = { renderCard, ready };
 })(this);

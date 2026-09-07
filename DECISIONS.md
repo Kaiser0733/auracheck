@@ -1,3 +1,11 @@
+Night-window artwork release
+
+- Use the supplied diptych's clean right panel, cropped beyond the center divider, as local assets/night-window.webp. Preserve original source outside the repository untouched.
+- Cover-fit without stretching; overlay dark purple for readability. Uniform lavender typography and straight stamp follow the supplied reference while preserving dynamic result text.
+- Await artwork loading before rendering or reopening cards. A load failure produces an explicit retry message and does not spend credit. Bundle the background in the offline cache.
+- Keep the existing card dimensions, scoring, question rotation and weekly quota.
+- Live X11 capture inspected via the available auxiliary image pipeline; do not describe this as native pixel inspection by the main model.
+
 Answer-based results release
 
 - Add two exact, context-labelled selected answers to the share card. Include a contrasting category when present; keep one entertainment line.
