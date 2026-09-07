@@ -12,7 +12,7 @@ let pass = 0;
 function t(name, fn){ try { fn(); pass++; console.log('✓', name); } catch(e){ console.error('✗', name, e.message); process.exitCode = 1; } }
 
 // --- data integrity ---
-t('quiz has 6 questions', () => assert.strictEqual(QUIZ.length, 6));
+t('quiz has 8 questions', () => assert.strictEqual(QUIZ.length, 8));
 t('every question has exactly 4 options', () =>
   QUIZ.forEach(q => assert.strictEqual(q.options.length, 4, `q${q.id}`)));
 t('option weights are sane', () => {
@@ -33,11 +33,11 @@ t('each card has stamp + palette', () => {
 
 // --- scoring ---
 t('mixed answers sum weights correctly', () => {
-  const tot = score([0,1], QUIZ); // q1.opt0: re-reading (d6,c4); q2.opt1: saving energy (a5,t5)
-  assert.strictEqual(tot.delulu, 6);
+  const tot = score([0,1], QUIZ); // q1.opt0: post aesthetic story (t4,d4,a2); q2.opt1: video essay (a3,d3,c4)
+  assert.strictEqual(tot.delulu, 7);
   assert.strictEqual(tot.chill, 4);
   assert.strictEqual(tot.aura, 5);
-  assert.strictEqual(tot.toxic, 5);
+  assert.strictEqual(tot.toxic, 4);
 });
 t('archetype picks max weight', () => {
   assert.strictEqual(archetype({aura:20,delulu:10,toxic:5,chill:1}), 'aura');
