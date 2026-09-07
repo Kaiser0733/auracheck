@@ -12,7 +12,7 @@ let pass = 0;
 function t(name, fn){ try { fn(); pass++; console.log('✓', name); } catch(e){ console.error('✗', name, e.message); process.exitCode = 1; } }
 
 // --- data integrity ---
-t('quiz has 8 questions', () => assert.strictEqual(QUIZ.length, 8));
+t('bank has 28 questions', () => assert.strictEqual(QUIZ.length, 28));
 t('every question has exactly 4 options', () =>
   QUIZ.forEach(q => assert.strictEqual(q.options.length, 4, `q${q.id}`)));
 t('option weights are sane', () => {

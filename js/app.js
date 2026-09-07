@@ -1,20 +1,21 @@
 (function () {
   const $ = id => document.getElementById(id);
-  const DRAFT = 'ac_draft_v6_today', HISTORY = 'ac_history_v1';
+  const DRAFT = 'ac_draft_v7_rotation', HISTORY = 'ac_history_v1';
   let answers = [], qi = 0, name = '', selected, busy = false;
-  let nextAllowedAt = 0;
+  let nextAllowedAt = 0, questions = [];
   function history() {
     const saved = Store.get(HISTORY);
     return Array.isArray(saved) ? saved.filter(p => p && p.palette && Array.isArray(p.lines)).slice(0,20) : [];
   }
   function draft() {
     const saved = Store.get(DRAFT);
-    if (!saved || !Array.isArray(saved.answers) || !Number.isInteger(saved.qi) || saved.qi < 0 || saved.qi >= QUIZ.length) return null;
+    if (!saved || !Array.isArray(saved.answers) || !Number.isInteger(saved.qi) || saved.qi < 0 || saved.qi >= 5) return null;
     if (saved.answers.some(a => a !== null && (!Number.isInteger(a) || a < 0 || a > 3))) return null;
+    if (!Array.isArray(saved.ids) || saved.ids.length!==5 || new Set(saved.ids).size!==5 || saved.ids.some(id=>!QUIZ.some(q=>q.id===id))) return null;
     return saved;
   }
   function persist() {
-    Store.set(DRAFT,{answers,qi,name,selected});
+    Store.set(DRAFT,{answers,qi,name,selected,ids:questions.map(q=>q.id)});
     storageNote();
   }
   function storageNote() {
@@ -41,22 +42,27 @@
       ShareKit.toast('Your free cards are used. Saved cards are still yours to share.');
       show('screen-history');renderHistory();return;
     }
-    answers=[];qi=0;name='';selected=undefined;nextAllowedAt=0;
+    answers=[];qi=0;name='';selected=undefined;nextAllowedAt=0;questions=[];
     $('name-input').value='';show('screen-name');
   }
   function begin() {
+    if(!questions.length){
+      const draw=Rotation.next(Store.get('ac_rotation_v1'));
+      questions=draw.ids.map(id=>QUIZ.find(q=>q.id===id));
+      Store.set('ac_rotation_v1',draw.remaining);
+    }
     name=$('name-input').value.trim().slice(0,20);
     persist();renderQuestion();show('screen-quiz');
   }
   function renderQuestion() {
     selected=answers[qi];
-    $('quiz-progress').textContent=`${qi+1} / ${QUIZ.length}`;
-    $('quiz-bar-fill').max=QUIZ.length;$('quiz-bar-fill').value=qi;
-    $('q-text').textContent=QUIZ[qi].text;
+    $('quiz-progress').textContent=`${qi+1} / ${questions.length}`;
+    $('quiz-bar-fill').max=questions.length;$('quiz-bar-fill').value=qi;
+    $('q-text').textContent=questions[qi].text;
     $('quiz-message').textContent='';
-    $('btn-next').textContent=qi===QUIZ.length-1?'Make my card':'Next question';
+    $('btn-next').textContent=qi===questions.length-1?'Make my card':'Next question';
     const box=$('q-opts');box.replaceChildren();
-    QUIZ[qi].options.forEach((option,index)=>{
+    questions[qi].options.forEach((option,index)=>{
       const button=document.createElement('button');button.className='opt';
       button.textContent=option.text;button.onclick=()=>select(index);box.append(button);
     });
@@ -76,7 +82,7 @@
     if(busy || selected===undefined || performance.now()<nextAllowedAt)return;
     nextAllowedAt=performance.now()+180;
     answers[qi]=selected;
-    if(qi<QUIZ.length-1){qi++;persist();renderQuestion();}
+    if(qi<questions.length-1){qi++;persist();renderQuestion();}
     else finish();
   }
   function back() {
@@ -99,7 +105,7 @@
     busy=true;syncSelection();
     const complete=()=>{
       if(Quota.remaining()<=0)throw Error('Your free cards were used in another tab. Your draft is saved.');
-      const totals=Engine.score(answers,QUIZ),trait=Engine.archetype(totals);
+      const totals=Engine.score(answers,questions),trait=Engine.archetype(totals);
       const old=history();
       const counts=Store.get('ac_variants_v1')||{};
       const sequence=Number.isInteger(counts[trait])?counts[trait]:0;
@@ -143,6 +149,7 @@
   $('btn-pause').onclick=()=>{persist();show('screen-home');};
   $('btn-resume').onclick=()=>{
     const saved=draft();if(!saved)return;
+    questions=saved.ids.map(id=>QUIZ.find(q=>q.id===id));
     answers=saved.answers;qi=saved.qi;name=String(saved.name||'').slice(0,20);
     $('name-input').value=name;renderQuestion();show('screen-quiz');
   };

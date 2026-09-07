@@ -34,6 +34,9 @@ try:
  wait("document.readyState==='complete'")
  evaluate("document.getElementById('btn-start').click(); document.getElementById('name-input').value='Test Reader';document.getElementById('btn-name-next').click()")
  wait("document.getElementById('screen-quiz').classList.contains('active')")
+ first_ids=evaluate("Store.get('ac_draft_v7_rotation').ids")
+ assert len(first_ids)==5 and len(set(first_ids))==5
+ first_question=evaluate("document.getElementById('q-text').textContent")
  evaluate("document.querySelector('.opt').click();document.querySelector('.opt').click()")
  assert evaluate("document.getElementById('quiz-progress').textContent").startswith('1'), 'selection advanced the question'
  evaluate("document.getElementById('btn-next').click();document.getElementById('btn-next').click()")
@@ -42,9 +45,11 @@ try:
  call('Page.reload',{},session);wait("document.readyState==='complete' && !document.getElementById('btn-resume').hidden")
  evaluate("document.getElementById('btn-resume').click()")
  assert evaluate("document.getElementById('quiz-progress').textContent").startswith('2'), 'resume lost position'
+ assert evaluate("Store.get('ac_draft_v7_rotation').ids")==first_ids, 'resume changed questions'
  evaluate("document.getElementById('btn-quiz-back').click()")
  assert evaluate("document.querySelector('.opt[aria-pressed=true]')!==null"), 'back lost selected answer'
- for i in range(8):
+ assert evaluate("document.getElementById('q-text').textContent")==first_question, 'Back changed prompt'
+ for i in range(5):
   evaluate("document.querySelector('.opt').click();document.getElementById('btn-next').click()")
   time.sleep(.22)
  wait("document.getElementById('screen-card').classList.contains('active')")
@@ -60,8 +65,10 @@ try:
   assert evaluate('document.documentElement.scrollWidth<=innerWidth'),f'overflow at {width}'
  # A failed render must not spend quota; saved draft remains retryable.
  evaluate("document.querySelector('#screen-card [data-home]').click();document.getElementById('btn-start').click();document.getElementById('btn-name-next').click()")
+ second_ids=evaluate("Store.get('ac_draft_v7_rotation').ids")
+ assert not set(first_ids)&set(second_ids), 'next check-in repeated questions'
  evaluate("window.originalRender=Render.renderCard;Render.renderCard=()=>{throw Error('test render failure')}")
- for i in range(8):
+ for i in range(5):
   evaluate("document.querySelector('.opt').click();document.getElementById('btn-next').click()")
   time.sleep(.22)
  assert evaluate('Quota.remaining()')==2,'failed render burned quota'
@@ -70,7 +77,7 @@ try:
  wait("document.getElementById('screen-card').classList.contains('active')")
  assert evaluate('Quota.remaining()')==1
  evaluate("document.getElementById('btn-again').click();document.getElementById('btn-name-next').click()")
- for i in range(8):
+ for i in range(5):
   evaluate("document.querySelector('.opt').click();document.getElementById('btn-next').click()")
   time.sleep(.22)
  wait("document.getElementById('screen-card').classList.contains('active')")
