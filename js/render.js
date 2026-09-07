@@ -3,7 +3,7 @@
 (function (global) {
 
   function renderCard(payload, opts = {}) {
-    const { palette, headline, sub, lines, stamp, percents } = payload;
+    const { palette, headline, sub, lines, stamp, percents, name } = payload;
     const pro = !!opts.pro;
 
     const W = 1080, H = 1920;
@@ -29,12 +29,18 @@
     ctx.letterSpacing = '3px';
     ctx.fillText('⟡  AURACHECK', 80, 140);
 
-    // date
+    // date + name
     ctx.fillStyle = '#6c6579';
     ctx.font = '500 30px system-ui';
     ctx.textAlign = 'right';
     const dstr = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
     ctx.fillText(dstr, W-80, 140);
+    if (name) {
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#9b93a8';
+      ctx.font = '500 32px system-ui';
+      ctx.fillText(`for ${name}`, 80, 210);
+    }
 
     // headline (big serif-ish, gold)
     ctx.textAlign = 'left';

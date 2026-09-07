@@ -29,11 +29,29 @@ window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').
     <p class="fineprint">no account. no ads. just the truth.</p>
   </section>
 
+  <!-- NAME -->
+  <section id="screen-name" class="screen">
+    <div class="quiz-progress">step 0 · identity</div>
+    <h2 class="q-text">what should the card call you?</h2>
+    <input type="text" id="name-input" class="name-input" placeholder="your name or vibe-alias" maxlength="20" autocomplete="off">
+    <button class="cta" id="btn-name-next">begin ↓</button>
+  </section>
+
   <!-- QUIZ -->
   <section id="screen-quiz" class="screen">
-    <div class="quiz-progress" id="quiz-progress">1 / 6</div>
+    <div class="quiz-top">
+      <button class="quiz-back" id="btn-quiz-back" aria-label="back">←</button>
+      <div class="quiz-progress" id="quiz-progress">1 / 8</div>
+      <div class="quiz-bar"><div class="quiz-bar-fill" id="quiz-bar-fill"></div></div>
+    </div>
     <h2 class="q-text" id="q-text"></h2>
     <div class="opts" id="q-opts"></div>
+  </section>
+
+  <!-- RITUAL, between quiz and card -->
+  <section id="screen-ritual" class="screen">
+    <div class="ritual-orbit"><div class="ritual-dot"></div></div>
+    <p class="ritual-line" id="ritual-line">reading your aura...</p>
   </section>
 
   <!-- CARD -->

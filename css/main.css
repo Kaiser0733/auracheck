@@ -37,12 +37,33 @@ body{min-height:100dvh;display:flex;justify-content:center}
 .ghost.quiet{border:0;color:var(--ink-dim);text-decoration:underline}
 
 /* QUIZ */
-.quiz-progress{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase}
-.q-text{font-size:26px;font-weight:700;line-height:1.25;max-width:340px}
+.quiz-top{display:flex;align-items:center;gap:14px;width:100%;max-width:340px}
+.quiz-progress{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase;flex-shrink:0}
+.quiz-back{background:none;border:1px solid var(--line);color:var(--ink);border-radius:12px;width:44px;height:44px;font-size:18px;flex-shrink:0}
+.quiz-bar{flex:1;height:3px;background:var(--card);border-radius:2px;overflow:hidden}
+.quiz-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--irid));width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.q-text{font-size:26px;font-weight:700;line-height:1.25;max-width:340px;animation:qSlide .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes qSlide{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .opts{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
-.opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:15.5px;text-align:left;color:var(--ink);line-height:1.35;transition:border-color .15s,transform .1s}
-.opt:active{border-color:var(--gold);transform:scale(.98)}
+.opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-size:15.5px;text-align:left;color:var(--ink);line-height:1.35;transition:border-color .15s,transform .1s;animation:optIn .3s cubic-bezier(.2,.8,.2,1) backwards}
+.opt:nth-child(2){animation-delay:.05s}
+.opt:nth-child(3){animation-delay:.1s}
+.opt:nth-child(4){animation-delay:.15s}
+@keyframes optIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.opt:active{border-color:var(--gold);transform:scale(.97)}
 .opt:hover{border-color:var(--irid)}
+
+/* NAME SCREEN */
+.name-input{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 22px;width:100%;max-width:320px;font-size:18px;color:var(--ink);text-align:center;letter-spacing:.5px;outline:none}
+.name-input:focus{border-color:var(--gold)}
+.name-input::placeholder{color:#6c6579}
+
+/* RITUAL */
+.ritual-orbit{width:64px;height:64px;border-radius:50%;border:1px dashed var(--irid);position:relative;animation:orbitSpin 2s linear infinite}
+.ritual-dot{position:absolute;top:-4px;left:50%;width:12px;height:12px;background:var(--gold);border-radius:50%;box-shadow:0 0 18px var(--gold);transform:translateX(-50%)}
+@keyframes orbitSpin{to{transform:rotate(360deg)}}
+.ritual-line{color:var(--ink-dim);font-size:16px;font-style:italic;animation:ritualFade .8s ease-in-out infinite alternate}
+@keyframes ritualFade{from{opacity:.4}to{opacity:1}}
 
 /* CARD */
 .card-holder{width:100%;max-width:340px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6)}
