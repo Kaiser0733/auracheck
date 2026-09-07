@@ -2,6 +2,7 @@
 const QUIZ = [
  {
   "id": 1,
+  "topic": "Feeling",
   "text": "Which feeling has shown up most today?",
   "options": [
    {
@@ -32,6 +33,7 @@ const QUIZ = [
  },
  {
   "id": 2,
+  "topic": "Energy",
   "text": "How does your energy feel right now?",
   "options": [
    {
@@ -62,6 +64,7 @@ const QUIZ = [
  },
  {
   "id": 3,
+  "topic": "Attention",
   "text": "Where has your attention gone today?",
   "options": [
    {
@@ -92,6 +95,7 @@ const QUIZ = [
  },
  {
   "id": 4,
+  "topic": "Conversations",
   "text": "How have conversations felt today, online or in person?",
   "options": [
    {
@@ -122,6 +126,7 @@ const QUIZ = [
  },
  {
   "id": 5,
+  "topic": "Patience",
   "text": "How has your patience been today?",
   "options": [
    {
@@ -152,6 +157,7 @@ const QUIZ = [
  },
  {
   "id": 6,
+  "topic": "Pace",
   "text": "What best describes your pace today so far?",
   "options": [
    {
@@ -182,6 +188,7 @@ const QUIZ = [
  },
  {
   "id": 7,
+  "topic": "Standout moment",
   "text": "What kind of moment has stuck with you today?",
   "options": [
    {
@@ -212,6 +219,7 @@ const QUIZ = [
  },
  {
   "id": 8,
+  "topic": "Outlook",
   "text": "How do you feel about the rest of today right now?",
   "options": [
    {
@@ -242,6 +250,7 @@ const QUIZ = [
  },
  {
   "id": 9,
+  "topic": "Waking up",
   "text": "How did getting out of bed feel today?",
   "options": [
    {
@@ -272,6 +281,7 @@ const QUIZ = [
  },
  {
   "id": 10,
+  "topic": "Phone",
   "text": "How has your phone affected your mood today?",
   "options": [
    {
@@ -302,6 +312,7 @@ const QUIZ = [
  },
  {
   "id": 11,
+  "topic": "Spare moment",
   "text": "What happened when you had a spare moment today?",
   "options": [
    {
@@ -332,6 +343,7 @@ const QUIZ = [
  },
  {
   "id": 12,
+  "topic": "First task",
   "text": "How did your first task feel today?",
   "options": [
    {
@@ -362,6 +374,7 @@ const QUIZ = [
  },
  {
   "id": 13,
+  "topic": "Self-talk",
   "text": "How have you felt about yourself today?",
   "options": [
    {
@@ -392,6 +405,7 @@ const QUIZ = [
  },
  {
   "id": 14,
+  "topic": "Changed plans",
   "text": "How did a change of plan land today?",
   "options": [
    {
@@ -422,6 +436,7 @@ const QUIZ = [
  },
  {
   "id": 15,
+  "topic": "After talking",
   "text": "How did you feel after your latest conversation today?",
   "options": [
    {
@@ -452,6 +467,7 @@ const QUIZ = [
  },
  {
   "id": 16,
+  "topic": "Inner voice",
   "text": "What has your inner voice sounded like today?",
   "options": [
    {
@@ -482,6 +498,7 @@ const QUIZ = [
  },
  {
   "id": 17,
+  "topic": "Decisions",
   "text": "How did you handle a small decision today?",
   "options": [
    {
@@ -512,6 +529,7 @@ const QUIZ = [
  },
  {
   "id": 18,
+  "topic": "Noise",
   "text": "How has your surroundings’ noise felt today?",
   "options": [
    {
@@ -542,6 +560,7 @@ const QUIZ = [
  },
  {
   "id": 19,
+  "topic": "Waiting",
   "text": "How did waiting for something feel today?",
   "options": [
    {
@@ -572,6 +591,7 @@ const QUIZ = [
  },
  {
   "id": 20,
+  "topic": "Social updates",
   "text": "How has looking at other people’s updates felt today?",
   "options": [
    {
@@ -602,6 +622,7 @@ const QUIZ = [
  },
  {
   "id": 21,
+  "topic": "Setbacks",
   "text": "How did a mistake or setback affect you today?",
   "options": [
    {
@@ -632,6 +653,7 @@ const QUIZ = [
  },
  {
   "id": 22,
+  "topic": "Breaks",
   "text": "How have breaks felt today?",
   "options": [
    {
@@ -662,6 +684,7 @@ const QUIZ = [
  },
  {
   "id": 23,
+  "topic": "Being noticed",
   "text": "How did you feel about being noticed today?",
   "options": [
    {
@@ -692,6 +715,7 @@ const QUIZ = [
  },
  {
   "id": 24,
+  "topic": "Unfinished tasks",
   "text": "How has unfinished stuff felt today?",
   "options": [
    {
@@ -722,6 +746,7 @@ const QUIZ = [
  },
  {
   "id": 25,
+  "topic": "Ideas",
   "text": "What happened when you had an idea today?",
   "options": [
    {
@@ -752,6 +777,7 @@ const QUIZ = [
  },
  {
   "id": 26,
+  "topic": "Time alone",
   "text": "How has being alone felt today?",
   "options": [
    {
@@ -782,6 +808,7 @@ const QUIZ = [
  },
  {
   "id": 27,
+  "topic": "Food and drink",
   "text": "How did you feel after eating or drinking something today?",
   "options": [
    {
@@ -812,6 +839,7 @@ const QUIZ = [
  },
  {
   "id": 28,
+  "topic": "Right now",
   "text": "Which feeling fits this check-in right now?",
   "options": [
    {

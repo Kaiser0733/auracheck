@@ -55,6 +55,21 @@ try:
  wait("document.getElementById('screen-card').classList.contains('active')")
  assert evaluate('Quota.remaining()')==2
  assert 'Test Reader' in evaluate("document.getElementById('card-canvas').getAttribute('aria-label')")
+ assert evaluate("document.querySelectorAll('#card-basis p').length")==5
+ assert evaluate("Store.get('ac_history_v1')[0].personalized") is True
+ # Verify every possible answer-based line fits the existing two-line canvas slots.
+ overflow=evaluate("""(()=>{
+ const ctx=document.createElement('canvas').getContext('2d');ctx.font='400 34px system-ui';ctx.letterSpacing='3px';
+ const bad=[];for(const q of QUIZ)for(const o of q.options){
+  const text=q.topic+': “'+o.text+'”';let line='',rows=1;
+  for(const word of text.split(' ')){const next=line?line+' '+word:word;if(ctx.measureText(next).width>860&&line){rows++;line=word;}else line=next;}
+  if(rows>2)bad.push(text);
+ }return bad;})()""")
+ assert not overflow, 'answer text overflows canvas slots: '+str(overflow)
+ import subprocess
+ call('Page.bringToFront',{},session)
+ subprocess.run(['sh','-c','DISPLAY=:0 import -window root "$HOME/auracheck-personalized-x11.png"'],check=True)
+
  evaluate("document.querySelector('#screen-card [data-home]').click();document.getElementById('btn-history').click();document.querySelector('#history-list button').click()")
  assert evaluate('Quota.remaining()')==2,'history burned quota'
  assert evaluate("document.documentElement.scrollWidth<=innerWidth"),'mobile horizontal overflow'

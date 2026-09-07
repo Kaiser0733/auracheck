@@ -97,6 +97,13 @@
     const transcript=[payload.name,payload.headline,payload.sub,...payload.lines,
       ...Object.entries(payload.percents).map(([trait,pct])=>`${trait==='toxic'?'prickly':trait}: ${pct}%`),'Entertainment only.'].filter(Boolean).join(' ');
     target.setAttribute('aria-label',transcript);$('card-transcript').textContent=transcript;
+    const basis=$('card-basis');basis.replaceChildren();
+    (payload.evidence||[]).forEach(entry=>{
+      const paragraph=document.createElement('p');
+      paragraph.textContent=`${entry.question} — ${entry.answer}`;basis.append(paragraph);
+    });
+    if(!payload.evidence)basis.textContent='This older card has no saved answer breakdown.';
+    $('card-explanation').open=false;
   }
   async function finish() {
     if(answers.filter(a=>Number.isInteger(a)).length<3){
@@ -110,7 +117,7 @@
       const counts=Store.get('ac_variants_v1')||{};
       const sequence=Number.isInteger(counts[trait])?counts[trait]:0;
       const card=Engine.pickCard(trait,CARDS,false,sequence);
-      const payload={...card,percents:Engine.percentages(totals),name,createdAt:new Date().toISOString()};
+      const payload={...Engine.personalize(answers,questions,card),percents:Engine.percentages(totals),name,createdAt:new Date().toISOString()};
       displayCard(payload); // Rendering must succeed before spending a credit.
       if(!Quota.consume())throw Error('No credits left. Your draft is saved.');
       Store.set(HISTORY,[payload,...old].slice(0,20));

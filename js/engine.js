@@ -42,14 +42,38 @@
   }
 
   /**
-   * Pick a card: same-day stability (siblings get same card), but free users
-   * ROTATE through the 3 cards each week so variety exists even unpaid.
-   * Pro: fresh random each time within the archetype's deck.
+   * Rotate the visual template by completed-card sequence.
+   * personalize() supplies answer-based content independently of the template.
    */
   function pickCard(trait, cards, pro, sequence = 0) {
     const list = cards[trait];
     return list[Math.max(0, Math.trunc(sequence)) % list.length];
   }
 
-  global.Engine = { score, archetype, percentages, pickCard };
+  function personalize(answers, quiz, template) {
+    const totals=score(answers,quiz);
+    const ranked=Object.keys(totals).sort((a,b)=>totals[b]-totals[a]);
+    const evidence=answers.flatMap((index,i)=>{
+      if(index===null)return [];
+      const question=quiz[i],option=question.options[index];
+      return [{question:question.text,topic:question.topic||'Today',answer:option.text,
+        trait:archetype(option.weights)}];
+    });
+    if(evidence.length<3)throw Error('Answer at least three questions.');
+    const mixed=totals[ranked[0]]===totals[ranked[1]];
+    const first=evidence.find(e=>e.trait===ranked[0]);
+    // Include a contrasting answer when present, rather than hiding the rest of the day.
+    const second=evidence.find(e=>e.trait!==first.trait)||evidence.find(e=>e!==first);
+    const title={aura:'Confident',delulu:'Mind wandering',toxic:'Prickly',chill:'At ease'};
+    const mix=ranked.filter(k=>totals[k]>0).map(k=>`${title[k]} ${totals[k]/10}`).join(' · ');
+    const quip=mixed?'Today refused to pick a single genre.':template.lines[2];
+    return {...template,
+      headline:mixed?'Mixed Weather':template.headline,
+      stamp:mixed?'A BIT OF BOTH':template.stamp,
+      sub:`${evidence.length} answers today. ${mix}.`,
+      lines:[`${first.topic}: “${first.answer}”`,`${second.topic}: “${second.answer}”`,quip],
+      evidence,personalized:true};
+  }
+
+  global.Engine = { score, archetype, percentages, pickCard, personalize };
 })(typeof module !== 'undefined' ? global : this);
