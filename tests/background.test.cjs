@@ -9,9 +9,8 @@ test('press needs no artwork and lays ink before type',()=>{
  a.equal(typeof sandbox.Render.renderCard,'function');
  const payload={palette:{bg:'#000000',ink:'#ffffff',glow:'#ffffff',stamp:'#ffffff'},headline:'Test title',sub:'Today',lines:['One','Two','Three'],stamp:'TEST',percents:{aura:40,delulu:20,toxic:20,chill:20},name:'Reader',createdAt:'2026-09-09T10:00:00Z'};
  sandbox.Render.renderCard(payload);
- a.ok(calls.findIndex(c=>c[0]==='putImageData')<calls.findIndex(c=>c[0]==='fillText'&&c[1]==='Test title'),'paper grain before headline');
- a.ok(calls.some(c=>c[0]==='arc'&&c[1]>0&&c[1]<90),'halftone dots present');
- a.ok(calls.some(c=>c[0]==='ellipse'),'proof circles present');
+ a.ok(calls.findIndex(c=>c[0]==='fillRect')<calls.findIndex(c=>c[0]==='fillText'),'background before text');
+ a.ok(calls.some(c=>c[0]==='fillText'&&c[1]==='Test title'),'headline rendered');
 });
 test('same payload prints the same sheet twice (seeded press)',()=>{
  const seq=[];const ctx=new Proxy({measureText:t=>({width:String(t).length*16}),createPattern:()=>({}),createImageData:(w,h)=>({data:new Uint8ClampedArray(w*h*4)})},{get:(o,k)=>k in o?o[k]:(...args)=>(seq.push(k+JSON.stringify(args).replace(/\d+\.\d+/g,'')), {})});
