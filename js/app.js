@@ -42,11 +42,13 @@
   }
   function redeemCode() {
     const raw = $('code-input').value.trim().toUpperCase();
-    if (Quota.redeem(raw)) {
+    const result = Quota.redeem(raw);
+    if (result==='ok') {
       $('code-input').value='';$('code-row').hidden=true;
       ShareKit.toast('Limit refilled — 3 cards live again.');
       updateHome();
-    } else ShareKit.toast('That code is not one of ours.');
+    } else if (result==='already') ShareKit.toast('This code was already used here. It refilled earlier — nothing new to add.');
+    else ShareKit.toast('That code is not one of ours.');
   }
   function start() {
     if (Quota.remaining()<=0) {

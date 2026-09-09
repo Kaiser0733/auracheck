@@ -10,28 +10,38 @@
     monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
     return monday.toISOString().slice(0,10);
   }
+  // Audit fix: one corruption policy, everywhere. Any invalid stored shape is
+  // treated as a fresh week AND repaired on read, so a single corrupted byte
+  // can never lock a visitor out until Monday or silently refill forever.
+  function valid(stored,week){
+    return stored && stored.week===week && Number.isInteger(stored.used)
+      && stored.used>=0 && stored.used<=LIMIT;
+  }
   function load(){
-    const stored=Store.get(KEY),week=weekKey();
-    if(!stored || stored.week!==week)return {week,used:0};
-    const used=Number.isInteger(stored.used)?Math.min(LIMIT,Math.max(0,stored.used)):LIMIT;
-    return {week,used};
+    const week=weekKey(),stored=Store.get(KEY);
+    if(!valid(stored,week)){
+      const fresh={week,used:0};
+      Store.set(KEY,fresh);          // self-repair on read
+      return fresh;
+    }
+    return {week,used:stored.used};
   }
   function remaining(){return LIMIT-load().used;}
   function consume(){
     const quota=load();if(quota.used>=LIMIT)return false;
     Store.set(KEY,{...quota,used:quota.used+1});return true;
   }
-  // Codex-style owner reset: a code in this release refills the limit once.
-  // The stored "codes" list is the visitor's personal redeemed-history — it
-  // only ever grows, so older releases keep accepting codes they already saw.
+  // Audit fix: three-state redeem. 'ok' = refilled now. 'already' = this
+  // code was redeemed before — truthful, no refill. 'bad' = not one of ours.
+  // The old boolean lied to the UI when a code was re-entered.
   function redeem(code){
     const claimed=(Store.get('ac_codes_v1')||[]);
-    if(claimed.includes(code))return true;           // idempotent
-    if(!CODES.includes(code))return false;           // not one of ours
+    if(claimed.includes(code))return 'already';
+    if(!CODES.includes(code))return 'bad';
     // fail closed: storage down → no reset happens (better than silent loss)
-    if(!Store.set('ac_codes_v1',[...claimed,code]))return false;
+    if(!Store.set('ac_codes_v1',[...claimed,code]))return 'bad';
     Store.set(KEY,{week:weekKey(),used:0});
-    return true;
+    return 'ok';
   }
   // Beta has no checkout. Client storage is NOT a paid entitlement authority.
   global.Quota={weekKey,remaining,consume,redeem,isPro:()=>false,unlock:()=>false,
