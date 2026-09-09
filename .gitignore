@@ -1,0 +1,16 @@
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+*.swp
+*~
+.idea/
+.vscode/
+
+# Local test servers / screenshots / scratch output
+*.log
+*.png.tmp
+auracheck-qa-*.log
+riso_card_preview.png
