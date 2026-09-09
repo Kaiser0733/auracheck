@@ -43,7 +43,7 @@
     Store.set(KEY,{week:weekKey(),used:0});
     return 'ok';
   }
-  // Beta has no checkout. Client storage is NOT a paid entitlement authority.
+  // Payments are closed. Client storage is NOT a paid entitlement authority.
   global.Quota={weekKey,remaining,consume,redeem,isPro:()=>false,unlock:()=>false,
     _setNow:fn=>{now=fn;},_reset:()=>{Store.del(KEY);Store.del('ac_codes_v1');},_codes:()=>[...CODES]};
 })(typeof module!=='undefined'?global:this);

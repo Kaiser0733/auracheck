@@ -38,7 +38,7 @@ t('quota resets next week', () => {
   assert.strictEqual(Q.remaining(), 3);
 });
 
-t('legacy codes cannot bypass beta quota', () => {
+t('legacy codes cannot bypass quota', () => {
   Q._reset();
   assert.strictEqual(Q.unlock('AC-PRO-2026'), false);
   Q.consume(); Q.consume(); Q.consume();
@@ -51,7 +51,7 @@ t('invalid code rejected', () => {
   assert.strictEqual(Q.isPro(), false);
 });
 
-t('beta membership stays inactive', () => {
+t('membership stays inactive', () => {
   assert.strictEqual(Q.unlock('AC-FOUNDER'), false);
   assert.strictEqual(Q.isPro(), false);
 });

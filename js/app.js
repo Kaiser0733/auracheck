@@ -198,7 +198,6 @@
     $('name-input').value=name;renderQuestion();show('screen-quiz');
   };
   $('btn-history').onclick=()=>{renderHistory();show('screen-history');};
-  $('btn-pro').onclick=()=>show('screen-pro');
   document.querySelectorAll('[data-home]').forEach(button=>button.onclick=()=>show('screen-home'));
   $('btn-share').onclick=()=>exportCard(true);$('btn-save').onclick=()=>exportCard(false);
   window.addEventListener('hashchange',()=>show('screen-home'));
