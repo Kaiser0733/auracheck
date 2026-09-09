@@ -36,7 +36,7 @@ try:
  wait("document.getElementById('screen-quiz').classList.contains('active')")
  first_ids=evaluate("Store.get('ac_draft_v7_rotation').ids")
  assert len(first_ids)==5 and len(set(first_ids))==5
- first_question=evaluate("document.getElementById('q-text').textContent")
+ first_question=evaluate("QUIZ.find(q=>q.id==="+json.dumps(first_ids[0])+").text")
  evaluate("document.querySelector('.opt').click();document.querySelector('.opt').click()")
  assert evaluate("document.getElementById('quiz-progress').textContent").startswith('1'), 'selection advanced the question'
  evaluate("document.getElementById('btn-next').click();document.getElementById('btn-next').click()")
@@ -48,7 +48,7 @@ try:
  assert evaluate("Store.get('ac_draft_v7_rotation').ids")==first_ids, 'resume changed questions'
  evaluate("document.getElementById('btn-quiz-back').click()")
  assert evaluate("document.querySelector('.opt[aria-pressed=true]')!==null"), 'back lost selected answer'
- assert evaluate("document.getElementById('q-text').textContent")==first_question, 'Back changed prompt'
+ wait("document.getElementById('q-text').textContent==="+json.dumps(first_question)), 'typewriter still setting the question'
  for i in range(5):
   evaluate("document.querySelector('.opt').click();document.getElementById('btn-next').click()")
   time.sleep(.22)

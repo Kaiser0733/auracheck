@@ -1,7 +1,7 @@
 // Bump this release whenever a shipped asset changes.
-const CACHE='auracheck-v9-night-window';
+const CACHE='auracheck-v10-riso-press';
 const ROOT=new URL('./',self.location.href);
-const ASSETS=['assets/night-window.webp','./','index.html','css/main.css','js/store.js','js/questions.js','js/cards.js','js/engine.js','js/quota.js','js/render.js','js/share.js','js/app.js','manifest.json'];
+const ASSETS=['./','index.html','css/main.css','js/store.js','js/questions.js','js/cards.js','js/engine.js','js/quota.js','js/render.js','js/share.js','js/app.js','manifest.json'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS.map(path=>new URL(path,ROOT).href))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('auracheck-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{

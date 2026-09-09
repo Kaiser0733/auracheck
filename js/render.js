@@ -1,169 +1,286 @@
-// render.js — 1080x1920 canvas card renderer (dark premium, gold glow, stamp watermark for free)
-// renderCard(cardPayload, opts:{pro:boolean}) → HTMLCanvasElement
+// render.js — the card is a riso print, not a dashboard.
+// Two spot inks, one paper. Every mark is drawn here; no photos, no gradients.
+// Same payload prints the same sheet twice (seeded "press"), like a real run.
+// renderCard(payload, {pro}) -> HTMLCanvasElement
 (function (global) {
 
-  const backdrop=new Image();
-  let loaded=false;
-  const ready=new Promise(resolve=>{
-    backdrop.onload=()=>{loaded=true;resolve();};
-    backdrop.onerror=()=>resolve();
-    backdrop.src='assets/night-window.webp';
-  });
+  // deterministic pseudo-random from a string seed — one card, one press run
+  function seeded(seed) {
+    let h = 2166136261;
+    for (let i = 0; i < seed.length; i++) {
+      h ^= seed.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    let s = h >>> 0;
+    return () => {
+      s ^= s << 13; s >>>= 0;
+      s ^= s >> 17;
+      s ^= s << 5;  s >>>= 0;
+      return s / 4294967296;
+    };
+  }
+
+  // xorshift paper grain, stamped once into a reusable tile
+  function grainTile(rnd, W, H) {
+    const tile = document.createElement('canvas');
+    tile.width = 220; tile.height = 220;
+    const tctx = tile.getContext('2d');
+    const img = tctx.createImageData ? tctx.createImageData(220, 220) : { data: new Array(220 * 220 * 4) };
+    for (let i = 0; i < img.data.length; i += 4) {
+      const v = 231 + (rnd() * 22 - 11);          // paper fibre wobble
+      img.data[i] = v; img.data[i+1] = v * 0.985; img.data[i+2] = v * 0.95; img.data[i+3] = 255;
+    }
+    if (tctx.putImageData) tctx.putImageData(img, 0, 0); // sandbox stubs may skip it
+    return tile;
+  }
+
+  // ink passes get their own drift so the two colours never sit perfectly
+  function inkDrift(rnd) { return (rnd() - 0.5) * 7; }
+
+  // halftone screen: coarse dots like a real duplicator drum
+  function halftone(ctx, x, y, w, h, dot, gap, ink, alpha, rnd) {
+    ctx.fillStyle = ink;
+    ctx.globalAlpha = alpha;
+    const jit = () => (rnd() - 0.5) * 1.6;
+    for (let yy = y; yy < y + h; yy += gap) {
+      for (let xx = x; xx < x + w; xx += gap) {
+        const r = dot * (0.75 + rnd() * 0.5);
+        ctx.beginPath();
+        ctx.arc(xx + jit(), yy + jit(), r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
 
   function renderCard(payload, opts = {}) {
-    if(!loaded)throw Error('Card artwork is not ready. Check your connection and reload; no credit was used.');
-    const { headline, sub, lines, stamp, percents, name } = payload;
-    const palette={bg:'#171025',ink:'#f1ebfa',glow:'#d4baff',stamp:'#c6a6f4'};
+    const { headline, sub, lines, stamp, percents, name, createdAt } = payload;
     const pro = !!opts.pro;
+
+    // seeded from card content — a saved card reprints pixel-identical
+    const seed = `${headline}|${sub}|${name || 'anon'}|${createdAt || ''}`;
+    const rnd = seeded(seed);
 
     const W = 1080, H = 1920;
     const cv = document.createElement('canvas');
     cv.width = W; cv.height = H;
     const ctx = cv.getContext('2d');
 
-    // Clean right-hand panel of the supplied artwork; cover without stretching.
-    const scale=Math.max(W/backdrop.width,H/backdrop.height);
-    const bw=backdrop.width*scale,bh=backdrop.height*scale;
-    ctx.drawImage(backdrop,(W-bw)/2,(H-bh)/2,bw,bh);
-    const shade=ctx.createLinearGradient(0,0,0,H);
-    shade.addColorStop(0,'rgba(15,9,29,0.65)');
-    shade.addColorStop(0.64,'rgba(15,9,29,0.76)');
-    shade.addColorStop(1,'rgba(15,9,29,0.45)');
-    ctx.fillStyle=shade;ctx.fillRect(0,0,W,H);
-
-    // radial glow (gold/iridescent, soft)
-    const g = ctx.createRadialGradient(W*0.5, H*0.28, 60, W*0.5, H*0.28, W*0.85);
-    g.addColorStop(0, palette.glow + '33');
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
+    // ---- PAPER ----
+    ctx.fillStyle = '#f4eddc';
     ctx.fillRect(0, 0, W, H);
+    const tile = grainTile(rnd);
+    const pat = ctx.createPattern(tile, 'repeat');
+    ctx.fillStyle = pat;
+    ctx.fillRect(0, 0, W, H);
+    // deckle-ish darker fibres at the left edge, like a ream edge
+    halftone(ctx, 0, 0, 54, H, 2.1, 9, '#d8cdb2', 0.5, rnd);
 
-    // header brand
-    ctx.fillStyle = '#d5c5e8';
-    ctx.font = '600 34px system-ui, sans-serif';
+    // ---- INKS: two fluorescent riso spot colours + their overlap ----
+    // warm ink (fluorescent orange-pink) and cool ink (fluorescent blue)
+    const INK_WARM = '#ff4f66';
+    const INK_COOL = '#0072bc';
+    const INK_DEEP = '#1d1b34';                    // near-black soy ink for type
+    const drift = { warm: inkDrift(rnd), cool: inkDrift(rnd) };
+
+    // ---- CROP MARKS (like a press sheet) ----
+    ctx.strokeStyle = INK_DEEP;
+    ctx.lineWidth = 3;
+    const cm = 54, len = 44;
+    [[cm,cm,1,1],[W-cm,cm,-1,1],[cm,H-cm,1,-1],[W-cm,H-cm,-1,-1]].forEach(([x,y,dx,dy]) => {
+      ctx.beginPath();
+      ctx.moveTo(x + dx*24, y); ctx.lineTo(x + dx*(24+len), y);
+      ctx.moveTo(x, y + dy*24); ctx.lineTo(x, y + dy*(24+len));
+      ctx.stroke();
+    });
+
+    // ---- MASTHEAD (hand-set, misregistered on purpose) ----
     ctx.textAlign = 'left';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('⟡  AURACHECK', 80, 140);
-
-    // date + name
-    ctx.fillStyle = '#c3b5d3';
-    ctx.font = '500 30px system-ui';
+    ctx.fillStyle = INK_WARM;                      // ghost pass
+    ctx.font = '700 42px "Courier New", monospace';
+    ctx.fillText('AURACHECK PRESS', 96 + drift.warm, 172 + drift.warm * 0.6);
+    ctx.fillStyle = INK_DEEP;                      // key pass on top
+    ctx.fillText('AURACHECK PRESS', 96, 168);
+    ctx.font = '400 22px "Courier New", monospace';
+    ctx.fillStyle = '#3a3556';
+    ctx.fillText(name ? `EDITION No.1 · FOR ${name.toUpperCase()}` : 'EDITION No.1', 96, 208);
+    // date, right-aligned, small caps mono
+    const dstr = new Date(createdAt || Date.now()).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' });
     ctx.textAlign = 'right';
-    const dstr = new Date(payload.createdAt || Date.now()).toLocaleDateString('en', { day:'numeric', month:'short', year:'numeric' });
-    ctx.fillText(dstr, W-80, 140);
-    if (name) {
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#d5c5e8';
-      ctx.font = '500 32px system-ui';
-      ctx.fillText(`for ${name}`, 80, 210, W-160);
-    }
-
-    // headline (big serif-ish, gold)
+    ctx.font = '400 22px "Courier New", monospace';
+    ctx.fillStyle = '#3a3556';
+    ctx.fillText(dstr, W - 96, 168);
     ctx.textAlign = 'left';
-    ctx.fillStyle = palette.glow;
-    ctx.font = '800 92px Georgia, serif';
-    ctx.shadowColor = palette.glow;
-    ctx.shadowBlur = 30;
-    wrapText(ctx, headline, 80, 410, W-160, 100);
-    ctx.shadowBlur = 0;
 
-    // sub line
-    ctx.fillStyle = palette.ink;
-    ctx.font = '500 36px system-ui';
-    wrapText(ctx, sub, 80, 700, W-160, 46);
+    // ---- HEADLINE: handset in Georgia, solid ink, misregistration ghost ----
+    ctx.font = '700 96px Georgia, serif';
+    const headlineY = 340;
+    wrapText(ctx, headline, 96, headlineY, W - 192, 112, (yy, lineText, lastLine) => {
+      // fluorescent underprint, offset — the classic riso slip
+      ctx.fillStyle = INK_WARM;
+      ctx.globalAlpha = 0.85;
+      ctx.fillText(lineText, 96 + 5 + drift.warm, yy + 5 + drift.warm);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = INK_DEEP;
+      ctx.fillText(lineText, 96, yy);
+    });
 
-    // divider
-    ctx.strokeStyle = 'rgba(211,188,244,0.35)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(80, 820);
-    ctx.lineTo(W-80, 820);
-    ctx.stroke();
+    // ---- SUB LINE: typewriter mono, lightly inked ----
+    ctx.font = '400 34px "Courier New", monospace';
+    ctx.fillStyle = INK_COOL;
+    wrapText(ctx, sub, 96, 600, W - 192, 50, null, 0.92);
 
-    // trait percentage bars
+    // ---- RULE: solid ink hairline with a halftone shadow ----
+    ctx.strokeStyle = INK_DEEP;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(96, 668); ctx.lineTo(W - 96, 668); ctx.stroke();
+    halftone(ctx, 96, 684, W - 192, 20, 1.6, 8, INK_WARM, 0.55, rnd);
+
+    // ---- TRAIT BARS: ink density gauges, not progress bars ----
+    // labelled in lower-case mono, value in hand-circled numerals
     if (percents) {
-      let by = 900;
-      const rows = [['✦ Aura', percents.aura],['⌖ Delulu', percents.delulu],['☀ Prickly', percents.toxic],['☁ Chill', percents.chill]];
-      rows.forEach(([label, pc]) => {
-        ctx.fillStyle = '#d5c5e8';
-        ctx.font = '600 32px system-ui';
-        ctx.fillText(label, 80, by);
-        ctx.fillStyle = palette.glow;
-        ctx.textAlign = 'right';
-        ctx.fillText(pc + '%', W-80, by);
-        ctx.textAlign = 'left';
-        // bar
-        ctx.fillStyle = 'rgba(165,133,205,0.25)';
-        ctx.fillRect(80, by+18, W-160, 14);
-        ctx.fillStyle = palette.glow;
-        ctx.fillRect(80, by+18, (W-160) * (pc/100), 14);
-        by += 100;
+      const rows = [['aura', percents.aura, INK_COOL], ['delulu', percents.delulu, INK_WARM], ['prickly', percents.toxic, INK_WARM], ['chill', percents.chill, INK_COOL]];
+      let by = 760;
+      rows.forEach(([label, pc, ink]) => {
+        // label
+        ctx.font = '700 30px "Courier New", monospace';
+        ctx.fillStyle = INK_DEEP;
+        ctx.fillText(label, 96, by);
+        // hand-drawn underline (wobbly)
+        ctx.strokeStyle = ink; ctx.lineWidth = 3;
+        wavyLine(ctx, 96, by + 14, 96 + ctx.measureText(label).width + 14, by + 14, rnd);
+        // gauge: halftone wedge scaled by percent — more ink, more dots
+        const gw = W - 500;
+        const fill = gw * (pc / 100);
+        halftone(ctx, 420, by - 18, gw, 40, 2.6, 7, ink, 0.85, rnd);
+        // the rest of the track stays unprinted, just a rule
+        ctx.strokeStyle = '#b8ad92'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(420, by + 26); ctx.lineTo(420 + gw, by + 26); ctx.stroke();
+        // value: circled, like a proof-reader's mark
+        ctx.font = '700 34px "Courier New", monospace';
+        ctx.fillStyle = INK_DEEP;
+        const val = pc + '%';
+        const vw = ctx.measureText(val).width;
+        ctx.fillText(val, W - 96 - vw, by);
+        // circle around the value — slight rotation, imperfect ellipse
+        ctx.strokeStyle = ink; ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.ellipse(W - 96 - vw / 2, by - 10, vw / 2 + 16, 32, (rnd() - 0.5) * 0.3, 0, Math.PI * 2);
+        ctx.stroke();
+        by += 120;
       });
     }
 
-    // roast lines
-    let ly = percents ? 1360 : 980;
-    ctx.font = '400 34px system-ui';
-    ctx.fillStyle = palette.ink;
+    // ---- QUOTES: hand-set lines with ink chevrons ----
+    let ly = percents ? 1290 : 760;
+    ctx.font = '400 34px "Courier New", monospace';
     lines.forEach(l => {
-      ctx.fillStyle = palette.glow;
-      ctx.fillText('›', 80, ly);
-      ctx.fillStyle = palette.ink;
-      wrapText(ctx, l, 130, ly, W-220, 44);
-      ly += 90;
+      // chevron in warm ink, text in deep ink
+      ctx.fillStyle = INK_WARM;
+      ctx.font = '700 36px "Courier New", monospace';
+      ctx.fillText('>', 96, ly);
+      ctx.fillStyle = INK_DEEP;
+      ctx.font = '400 34px "Courier New", monospace';
+      wrapText(ctx, l, 148, ly, W - 148 - 96, 46, null, 0.95);
+      ly += 96;
     });
 
-    // stamp — rotated capsule
+    // ---- STAMP: rubber stamp, double-struck, slightly rotated ----
     ctx.save();
-    ctx.translate(W/2, H-240);
-    ctx.rotate(0);
-    ctx.strokeStyle = palette.stamp;
-    ctx.lineWidth = 5;
-    ctx.font = '800 38px system-ui';
-    const sw = Math.min(W-180, ctx.measureText(stamp).width + 90);
-    roundRect(ctx, -sw/2, -60, sw, 110, 20);
-    ctx.fillStyle='rgba(81,51,119,0.28)';ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = palette.stamp;
-    ctx.font = '800 38px system-ui';
+    const stampX = W / 2, stampY = percents ? 1770 : 1290;
+    ctx.translate(stampX, stampY);
+    ctx.rotate(-0.03 + (rnd() - 0.5) * 0.06);
+    ctx.font = '700 40px "Courier New", monospace';
+    const sw = ctx.measureText(stamp).width + 100;
+    // strike one
+    rubberBox(ctx, -sw/2, -46, sw, 92, INK_WARM, rnd);
+    ctx.fillStyle = INK_WARM;
     ctx.textAlign = 'center';
-    ctx.fillText(stamp, 0, 12, sw-60);
+    ctx.fillText(stamp, 0, 12, sw - 40);
+    // strike two, offset — rubber stamps never land twice in the same place
+    ctx.rotate((rnd() - 0.5) * 0.04);
+    rubberBox(ctx, -sw/2 + 6, -40, sw, 92, INK_WARM, rnd);
+    ctx.fillStyle = INK_WARM;
+    ctx.fillText(stamp, 6, 18, sw - 40);
     ctx.restore();
+    ctx.textAlign = 'left';
 
-    // watermark (free only)
+    // ---- INK TEST STRIP + REGISTRATION BLOCK (printer's proof marks) ----
+    // small squares of each ink at the bottom, like checking the drum
+    const stripY = H - 120;
+    ['#ff4f66', '#0072bc', '#1d1b34', '#d8a200'].forEach((ink, i) => {
+      ctx.fillStyle = ink;
+      ctx.fillRect(96 + i * 64, stripY, 44, 44);
+    });
+    // edition line
+    ctx.font = '400 20px "Courier New", monospace';
+    ctx.fillStyle = '#3a3556';
+    ctx.fillText('hand-pulled · 2 spot inks · entertainment, not evidence', 96 + 4 * 64 + 24, stripY + 30);
+
+    // ---- WATERMARK (free only): offset colophon ----
     if (!pro) {
-      ctx.fillStyle = 'rgba(224,207,246,0.85)';
-      ctx.font = '500 28px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('made with auracheck ✦ check yours', W/2, H-100);
+      ctx.textAlign = 'right';
+      ctx.font = '400 22px "Courier New", monospace';
+      ctx.fillStyle = '#6b6350';
+      ctx.fillText('printed with auracheck · print yours', W - 96, stripY + 30);
+      ctx.textAlign = 'left';
     }
 
     return cv;
   }
 
-  function wrapText(ctx, text, x, y, maxW, lh) {
+  // wavy hand-drawn underline
+  function wavyLine(ctx, x1, y1, x2, y2, rnd) {
+    const steps = 14;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      ctx.lineTo(x1 + (x2 - x1) * t, y1 + Math.sin(t * Math.PI * 2.2) * 3 + (rnd() - 0.5) * 2);
+    }
+    ctx.stroke();
+  }
+
+  // rubber-stamp border: uneven double ring with rough corners
+  function rubberBox(ctx, x, y, w, h, ink, rnd) {
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    const r = 14;
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.stroke();
+    // inner ring, slightly off — stamps are never perfect
+    ctx.lineWidth = 2.5;
+    const in_ = 10;
+    ctx.strokeRect(x + in_ + (rnd() - 0.5) * 3, y + in_ + (rnd() - 0.5) * 3, w - in_ * 2, h - in_ * 2);
+  }
+
+  function wrapText(ctx, text, x, y, maxW, lh, perLine, alpha) {
+    if (alpha !== undefined) ctx.globalAlpha = alpha;
     const words = String(text).split(' ');
-    let line = '';
-    let yy = y;
+    let line = '', yy = y, first = true;
+    const flush = () => {
+      if (perLine) perLine(yy, line, first); else ctx.fillText(line, x, yy);
+      first = false;
+    };
     for (const w of words) {
       const test = line ? line + ' ' + w : w;
       if (ctx.measureText(test).width > maxW && line) {
-        ctx.fillText(line, x, yy);
-        line = w; yy += lh;
+        flush(); line = w; yy += lh;
       } else line = test;
     }
-    if (line) ctx.fillText(line, x, yy);
+    if (line) flush();
+    ctx.globalAlpha = 1;
+    return yy;
   }
 
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.arcTo(x+w, y, x+w, y+h, r);
-    ctx.arcTo(x+w, y+h, x, y+h, r);
-    ctx.arcTo(x, y+h, x, y, r);
-    ctx.arcTo(x, y, x+w, y, r);
-    ctx.closePath();
-  }
-
-  global.Render = { renderCard, ready };
-})(this);
+  global.Render = { renderCard, ready: Promise.resolve() };
+})(typeof module !== 'undefined' ? global : this);

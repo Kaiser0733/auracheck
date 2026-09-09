@@ -58,7 +58,7 @@
     selected=answers[qi];
     $('quiz-progress').textContent=`${qi+1} / ${questions.length}`;
     $('quiz-bar-fill').max=questions.length;$('quiz-bar-fill').value=qi;
-    $('q-text').textContent=questions[qi].text;
+    typeOut($('q-text'),questions[qi].text);   // typewriter: the press sets the question live
     $('quiz-message').textContent='';
     $('btn-next').textContent=qi===questions.length-1?'Make my card':'Next question';
     const box=$('q-opts');box.replaceChildren();
@@ -89,11 +89,32 @@
     if(busy)return;
     if(qi>0){qi--;persist();renderQuestion();}else show('screen-name');
   }
+  // typewriter — chars land with a human beat, not a metronome.
+  // back() and resume() can interrupt; each call cancels the previous run.
+  let typeTimer = 0;
+  function typeOut(el, text) {
+    clearTimeout(typeTimer);
+    el.textContent = '';
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = text; return; }
+    let i = 0;
+    (function step() {
+      if (el.dataset.typed !== undefined && el.textContent.length >= text.length) return;
+      el.textContent = text.slice(0, ++i);
+      if (i < text.length) typeTimer = setTimeout(step, 18 + Math.random() * 34);
+    })();
+  }
+
   function displayCard(payload) {
     const rendered=Render.renderCard(payload,{pro:false});
     const target=$('card-canvas');
     target.getContext('2d').clearRect(0,0,target.width,target.height);
     target.getContext('2d').drawImage(rendered,0,0);
+    // stamp-thunk: the sheet lands on the felt, one small rotation settle
+    target.classList.remove('thunk');
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      void target.offsetWidth;               // restart the animation
+      target.classList.add('thunk');
+    }
     const transcript=[payload.name,payload.headline,payload.sub,...payload.lines,
       ...Object.entries(payload.percents).map(([trait,pct])=>`${trait==='toxic'?'prickly':trait}: ${pct}%`),'Entertainment only.'].filter(Boolean).join(' ');
     target.setAttribute('aria-label',transcript);$('card-transcript').textContent=transcript;

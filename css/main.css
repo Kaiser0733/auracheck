@@ -55,6 +55,10 @@ label{font-size:13px;color:var(--muted)}
 .name-input{background:var(--panel);color:var(--ink);font-size:18px}
 .card-holder{width:100%;max-width:380px;align-self:center;border:1px solid var(--line);overflow:hidden;border-radius:8px}
 #card-canvas{display:block;width:100%;height:auto}
+@keyframes thunk{0%{transform:scale(1.06) rotate(1.6deg);opacity:.4}55%{transform:scale(.985) rotate(-.5deg);opacity:1}100%{transform:none;opacity:1}}
+#card-canvas.thunk{animation:thunk 240ms cubic-bezier(.2,.9,.3,1.2)}
+.q-text::after{content:'▌';color:var(--gold);animation:caret 830ms steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
 @media(max-height:900px){
  .card-holder{max-width:280px}
  #screen-card{padding-top:24px;gap:12px}
@@ -71,4 +75,4 @@ footer{max-width:960px;padding:24px clamp(20px,5vw,48px) max(24px,env(safe-area-
 .toast.show{opacity:1}
 @media(min-width:800px){#screen-home{max-width:none;display:none;grid-template-columns:1.2fr 1fr;column-gap:48px}#screen-home.active{display:grid}#screen-home>*{grid-column:1}.sample{grid-column:2!important;grid-row:2/9;align-self:center;transform:rotate(3deg);padding:32px}.sample h2{font-size:38px}.fineprint{grid-column:1/-1!important}}
 @media(max-width:360px){.edition{font-size:9px;letter-spacing:.6px}.masthead{padding:18px 20px}.screen{padding-top:24px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.sample{transform:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.sample{transform:none!important}.q-text::after{content:none}}
