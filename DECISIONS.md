@@ -25,3 +25,9 @@ Question rotation release
 - Owner confirmed three free cards per week as the intended model; keep it. Paid extras remain unavailable until real checkout and server-side entitlement exist.
 - Existing saved cards remain available. Pre-rotation drafts are not reinterpreted with new questions.
 - New regression tests cover pool size, unique draws, exhaustion, corrupt queue recovery and immutable input. Browser checks cover stable IDs through reload/resume, Back, and different next-session IDs.
+
+## 2026-09-09 — Card becomes a riso press (AI-slop purge)
+
+Research: Reddit-mined study (3.2M posts, 47 subs, 3,033 on-topic comments) ranked AI-site tells. Top: "all look the same", shadcn/Tailwind defaults, AI purple, gradients, boilerplate animations, rounded-everything, dark+neon glow, emoji icons, generic fonts, hero+3-cards, and the 2026 "tasteful default" (cream+serif+sage). Our web shell scored 0/10 on the unslop scanner; every failing tell was in the CARD: AI-generated photo bg, purple palette, neon glow, gradients, emoji glyphs, system-ui font.
+
+Decision: rebuild the card as a seeded risograph print — procedural paper grain, two fluorescent spot inks (#ff4f66 warm / #0072bc cool) with deliberate misregistration, halftone dots, wavy underlines, proof circles, double-struck rubber stamp, crop marks, ink test strip. All drawn in code; the AI photo is deleted. Same payload reprints pixel-identical (seeded press, like a real run). No purple, no glow, no gradient, no emoji, no system-ui. Motion is hand-rolled identity motion (typewriter question setter, stamp-thunk reveal), gated by prefers-reduced-motion — NOT scroll fade-ins (which the data flags as slop).
