@@ -2,17 +2,17 @@
 
 > **Goal:** Build "AuraCheck" (working name) — an offline-first PWA that generates viral, shareable Gen Z identity cards (Wrapped-style personality reports), with a free tier (3 cards/week, watermarked) and Pro unlock (₹99/month) — hosted free on GitHub Pages, zero API, zero server, zero runtime cost.
 
-**Architecture:** Single-page vanilla HTML/CSS/JS app (no framework — phone CPU friendly, no build step). Cards are quiz → deterministic engine → canvas-rendered 1080×1920 PNG. State (quota, Pro flag, history) lives in localStorage with IndexedDB fallback. Payments in MVP = manual UPI + unlock code (₹0 fees, offline); Razorpay integration is a post-validation task.
+**Architecture:** Single-page vanilla HTML/CSS/JS app (no framework — phone CPU friendly, no build step). Cards are quiz → deterministic engine → canvas-rendered 1080×1920 PNG. State (quota, Pro flag, history) lives in localStorage with IndexedDB fallback. Payments in MVP = deferred; a checkout may be added only after the free product proves demand.
 
-**Constraint law (from LO):** No external APIs. No AI calls at runtime. Card generation works offline after first load (PWA cache); **the first install + payments need internet** — plan says this plainly, no fake "fully offline" claim. Phone-first: target 360×740 viewport, touch targets ≥48px. Card render <500ms on low-end Android.
+**Constraints:** No external APIs. No AI calls at runtime. Card generation works offline after first load (PWA cache); **the first install + payments need internet** — plan says this plainly, no fake "fully offline" claim. Phone-first: target 360×740 viewport, touch targets ≥48px. Card render <500ms on low-end Android.
 
-**Locked product decisions (LO call, 2026-09-06):**
+**Product decisions (2026-09-06):**
 - Look: **Dark premium** — deep black bg, gold/iridescent accents, Co-Star energy. One visual system, not per-archetype palettes.
 - Voice: **English with desi sprinkles** — "certified delulu since 2004" register. No Devanagari, no full Hinglish.
 - Roast level: **savage-but-loving** (single mode).
 - Audience: **all-gender neutral** voice; gender editions are a post-validation roadmap item.
-- Quiz UX: **no time limit** — user can ponder as long as they want (LO explicit ask).
-- Card art: concepts will be generated via ChatGPT (Termux X11 browser flow), then hand-translated into canvas code so runtime stays API-free.
+- Quiz UX: **no time limit** — user can ponder as long as they want.
+- Card art: concepts will be generated as static canvas-drawn art, translated into code so runtime stays API-free.
 
 **Hosting:** GitHub repo + GitHub Pages (free). CNAME later if/when a domain is bought. Deploy = push to `main`, Pages serves `/docs` or `gh-pages` branch.
 
@@ -121,7 +121,7 @@ TDD with injected clock (`quota.js` exports `_setNow(fn)` test hook): advance pa
 
 ## Task 7 — Wiring: quiz flow → card → share
 
-`index.html` glue: home (card count, "make your card" big button) → quiz (one question per screen, swipe/tap) → render → preview → two buttons: **Share** (Web Share API `navigator.share({files:[blob]})` — canvas.toBlob) and **Download** fallback. Watermark free, clean for Pro. Verify manually on LO's phone via LAN URL. Commit `feat: end-to-end flow`.
+`index.html` glue: home (card count, "make your card" big button) → quiz (one question per screen, swipe/tap) → render → preview → two buttons: **Share** (Web Share API `navigator.share({files:[blob]})` — canvas.toBlob) and **Download** fallback. Watermark free, clean for Pro. Verify manually on the owner's phone via LAN URL. Commit `feat: end-to-end flow`.
 
 ## Task 8 — PWA + GitHub Pages
 
@@ -140,7 +140,7 @@ Verify (wait ~60s): `curl -s -o /dev/null -w "%{http_code}" https://<user>.githu
 
 ## Task 10 — Validation script (the kill/pass gate, plain doc)
 
-`docs/VALIDATION.md`: 7-day plan — we generate 10 sample cards via the app itself, post to 3 spots LO chooses (confession pages/comments, WhatsApp groups), track via stripped Bitly-style link or manual count. PASS = 30+ "link?" / install requests in 7 days. FAIL = archive the persona, keep the engine for reuse. Gate happens BEFORE Task 9 is ever built.
+`docs/VALIDATION.md`: 7-day plan — we generate 10 sample cards via the app itself, post to 3 spots the owner chooses (confession pages/comments, WhatsApp groups), track via stripped Bitly-style link or manual count. PASS = 30+ "link?" / install requests in 7 days. FAIL = archive the persona, keep the engine for reuse. Gate happens BEFORE Task 9 is ever built.
 
 ---
 
@@ -148,10 +148,10 @@ Verify (wait ~60s): `curl -s -o /dev/null -w "%{http_code}" https://<user>.githu
 
 - **UPI consent in a PWA with no backend:** unlock codes are honor-system; abuse accepted at MVP scale.
 - **Web Share file support**: iOS Safari spotty — fallback download always present (Android-first anyway).
-- **Card copy must be genuinely funny.** This is the single biggest risk; mediocre copy = dead app. LO reviews every card line before Task 4 is "done."
+- **Card copy must be genuinely funny.** This is the single biggest risk; mediocre copy = dead app. the owner reviews every card line before Task 4 is "done."
 - **Trademark check** for the final name before public launch (`AuraCheck` generic-enough; search Play + .in domain).
 - **No analytics in MVP** — privacy is the sell; validation counted manually.
 
 ## Definition of done (for the MVP phase)
 
-Repo live on GitHub Pages, installable on LO's phone, 6-question quiz → distinct card → share to WhatsApp in under 90 seconds cold, quota resets Monday IST, Pro unlocks via code, all unit tests green, LO has installed it and made a card himself.
+Repo live on GitHub Pages, installable on the owner's phone, 6-question quiz → distinct card → share to WhatsApp in under 90 seconds cold, quota resets Monday IST, Pro unlocks via code, all unit tests green, the owner has installed it and made a card himself.

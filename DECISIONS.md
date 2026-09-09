@@ -14,7 +14,7 @@ Answer-based results release
 - Warn that exported cards contain two answers. No answers are sent to a server by this change.
 - Keep old saved payloads readable; no regeneration or extra quota charge on reopening.
 - Usability reference: https://www.nngroup.com/articles/recognition-and-recall/ — recognition benefits from visible context. Applying this to result explanation is a design inference, not evidence of improved retention.
-- Beta evidence still needed: perceived relevance, comfort sharing answer quotes, and repeat visits. No claim that users necessarily make exactly one card per day. (Superseded 2026-09-09: payments/Pro removed from production per LO decision — site is free-only, ad/sell path decided when traffic grows.)
+- Beta evidence still needed: perceived relevance, comfort sharing answer quotes, and repeat visits. No claim that users necessarily make exactly one card per day. (Superseded 2026-09-09: payments/Pro removed from production by the owner — site is free-only, ad/sell path decided when traffic grows.)
 
 Question rotation release
 
