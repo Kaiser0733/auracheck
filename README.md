@@ -4,8 +4,6 @@ A mood-card generator that lives entirely in the browser. Answer five questions 
 
 Live at **https://kaiser0733.github.io/auracheck/**
 
-![Example card](docs/card-preview.png)
-
 ## What it does
 
 You check in with how today felt. Five questions, drawn from a rotating bank of 28, all phrased about *today* rather than "your personality" — the read you get is a snapshot, not a diagnosis. Answers run through a small scoring engine that weighs four traits (aura, delulu, prickly, chill), picks the dominant one, and prints a card with your name, your percentages, and two of your own answers quoted back at you. The card export includes those quotes, so you get a warning before sharing.
