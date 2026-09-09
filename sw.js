@@ -1,5 +1,5 @@
 // Bump this release whenever a shipped asset changes.
-const CACHE='auracheck-v11-readable-card';
+const CACHE='auracheck-v12-reset-codes';
 const ROOT=new URL('./',self.location.href);
 const ASSETS=['./','index.html','css/main.css','js/store.js','js/questions.js','js/cards.js','js/engine.js','js/quota.js','js/render.js','js/share.js','js/app.js','manifest.json'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS.map(path=>new URL(path,ROOT).href))).then(()=>self.skipWaiting())));

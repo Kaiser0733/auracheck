@@ -31,11 +31,22 @@
   function updateHome() {
     const remaining = Quota.remaining();
     $('quota-pill').textContent = `${remaining} of 3 free cards left this week`;
+    const burned = remaining<=0;
+    $('code-row').hidden = !burned;   // redeem field appears exactly when needed
     $('btn-resume').hidden = !draft();
     const monday = new Date(Quota.weekKey()+'T00:00:00Z');
     const reset = new Date(monday.getTime()+7*86400000-330*60000);
     $('reset-note').textContent = `Next reset: ${reset.toLocaleString(undefined,{weekday:'short',hour:'numeric',minute:'2-digit',timeZoneName:'short'})} (your time).`;
+    $('code-note').textContent = burned ? 'Or use a reset code if you have one.' : '';
     storageNote();
+  }
+  function redeemCode() {
+    const raw = $('code-input').value.trim().toUpperCase();
+    if (Quota.redeem(raw)) {
+      $('code-input').value='';$('code-row').hidden=true;
+      ShareKit.toast('Limit refilled — 3 cards live again.');
+      updateHome();
+    } else ShareKit.toast('That code is not one of ours.');
   }
   function start() {
     if (Quota.remaining()<=0) {
@@ -172,6 +183,8 @@
     finally{button.disabled=false;}
   }
   $('btn-start').onclick=start;$('btn-again').onclick=start;
+  $('btn-code').onclick=redeemCode;
+  $('code-input').onkeydown=event=>{if(event.key==='Enter')redeemCode();};
   $('btn-name-next').onclick=begin;
   $('name-input').onkeydown=event=>{if(event.key==='Enter')begin();};
   $('btn-quiz-back').onclick=back;$('btn-next').onclick=next;$('btn-skip').onclick=()=>select(null);
